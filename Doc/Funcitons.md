@@ -1,0 +1,140 @@
+### 功能分析文档 与 用户交互设计
+ 
+#### 用户管理模块
+
+- 功能1
+  - 登录
+  - 输入 [用户名] [密码]
+  - 输出 **登录成功** 或 **登录失败 + 失败信息**
+  - 命令格式 
+    - login [username] [password]
+  - 输出格式
+    - Successfully! 
+    - Failed with (unkown user / wrong password)
+- 功能2
+  - 创建用户
+  - 输入 [用户名] [密码] [权限]
+  - 输出 **创建成功** 或 **删除失败 + 失败信息**
+  - 命令格式
+    - creat [username] [password] [root]
+  - 输出格式
+    - Successfully!
+    - Failed with (Created user / Unleagal Username / Not administrator)
+- 功能3
+  - 删除用户
+  - 输入 [用户名]
+  - 输出 **删除成功** 或 **删除失败 + 失败信息**
+  - 命令格式
+    - delete [username]
+  - 输出格式
+    - Successfully!
+    - Failed with (Not administrator / Not exist)
+- 功能4 
+  - 退出登录
+  - 输出 
+  - 命令格式
+    - Logout
+  - 输出格式
+    - Failed with guest!
+    - (游客无法退出)
+
+#### 图书管理模块
+
+- 功能1
+  - 查询图书
+  - 输入 [ISBN] [书名] [作者] [关键字]
+  - 输出 **查询信息** 或 **权限不够** 或 **未找到对应图书**
+  - 命令格式
+    - search -ISBN [ISBN] -name [bookname] -writer [author] -key [keywords]
+  - 输出格式
+    - [ISBN] [Name] [Author] [Quatinty] [Sale]
+    - Permission denied / Book doesn't exist
+- 功能2
+  - 购买图书
+  - 输入 [ISBN] [书名] [作者] [关键字] [购买数量] 
+  - 输出 **购买成功** 或 **未找到对应图书** 或 **库存不足** 或 **权限不够**
+  - 命令格式
+    - buy -ISBN [ISBN] -name [bookname] -writer [author] - key [keywords] +[Amount] 
+  -输出格式
+    - Successfully! 
+    - Book doesn't exist / Quantity is insufficient / Permission denied
+-  功能3
+  - 采购图书
+  - 输入 [ISBN]  [购买数量] [单价]
+  - 输出 **采购成功** 或 **未找到对应图书** 或 **权限不够**
+  - 命令格式 
+    - purchase -ISBN [ISBN] - amount [Amount] -sale [sale]
+  输出格式
+    - Successfully
+    - Permission denied
+-  功能4
+  - 修改图书信息
+  - 输入 [ISBN] [书名] [作者] [关键字] 
+  - 输出 **修改成功** 或 **修改失败**
+  - 命令格式
+    - modify -ISBN [ISBN] -name [bookname] -writer [author] - key [keywords]
+  - 输出格式
+    - Successfully
+    - Book doesn't exist / Permission denied
+- 功能5 
+  - 录入图书信息
+  - 输入 [ISBN] [书名] [作者] [关键字] [库存量] [单价]
+  - 输出 **录入成功** 或 **录入失败**
+  - 命令格式
+    - insert -ISBN [ISBN] -name [bookname] -writer [author] - key [keywords] - amount [Amount] -sale [sale]
+  - 输出格式
+    - Successfully
+    - Book doesn't exist / Permission denied / Insufficient information
+
+#### 日志管理模块
+
+- 功能1
+  - 查询采购信息
+  - 输入 [起始时间] [结束时间]
+  - 输出 **查询信息** 或 **查询失败**
+  - 命令格式
+    - quirery -type=purchase time1 time2
+  - 输出格式
+    - [Time] [User] [ISBN] [Quantity] [Amount]
+    - Permission denied 
+- 功能2
+    - 查询销售信息
+    - 输入 [起始时间] [结束时间]
+    - 输出 **查询信息** 或 **查询失败**
+    - 命令格式
+        - quirery -type=sale time1 time2
+    - 输出格式
+        - [Time] [User] [ISBN] [Quantity] [Amount]
+        - Permission denied
+- 功能2
+    - 查询盈利信息
+    - 输入 [起始时间] [结束时间]
+    - 输出 **查询信息** 或 **查询失败**
+    - 命令格式
+        - quirery -type=profit time1 time2
+    - 输出格式
+        - [Time] [Expend] [Income] [Total]
+        - Permission denied
+- 功能3
+    - 查询员工操作信息
+    - 输入 [起始时间] [结束时间]
+    - 输出 **查询信息** 或 **查询失败**
+    - 命令格式
+        - quirery -type=work time1 time2
+    - 输出格式
+        - [Time] [Operator] [User] [Information]
+        - Permission dinied
+- 功能4
+    - 查询系统工作信息
+    - 输入 [起始时间] [结束时间]
+    - 输出 **查询信息** 或 **查询失败**
+    - 命令格式
+        - Quirery -type=log time1 time2
+    - 输出格式
+        - [type = CreatUser] [username] [password] [root]
+        - [type = Login] [time] [username]
+        - [type = Logout] [time] [username]
+        - [type = Modify] [time] [username] [password] [root]
+        - [type = Running] [time]
+        - [type = Exit] [time]
+        - Permission denied 
