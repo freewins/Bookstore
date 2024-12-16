@@ -1,0 +1,38 @@
+@startuml
+
+class User
+class Book
+
+class State
+class sysinfo
+abstract class LogBase
+class Profit
+class Operator
+class SystemLog
+
+enum error
+{
+defualt = 0
+}
+
+LogBase --|> Profit
+LogBase --|> SystemLog
+LogBase --|> Operator
+
+
+class LogBase{
+save()
+read()
+print()
+}
+class Profit{
+Profit::save(char Id,double pro)
+}
+class State{
+FilePath
+Time
+}
+
+
+
+@enduml
