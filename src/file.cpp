@@ -179,7 +179,7 @@ void Index<T, len,info>::Split(Block *cur) {
 //TODO
 
 template<typename T, int len,int info>
-bool Index<T, len,info>::insertData(const char *key, T value) {
+bool Index<T, len,info>::insertData(const char *key, T &value) {
   Block *cur = nullptr;
   Block *forcur = nullptr;
   Block *p = head;
@@ -236,6 +236,45 @@ bool Index<T, len,info>::insertData(const char *key, T value) {
 
 //寻找数据
 //TODO Read all and watch
+///
+/// @param key 查找时的唯一键值
+/// @param check 检测是否找到
+/// @param pos 返回找到对象的文件位置，仅为了在update的时候调用
+/// @return
+template<typename T, int len,int info>
+T Index<T, len, info>::findData(const char *key, bool &check,int & pos) {
+  Block *cur = head;
+  Data *pools = new Data[sqrBlocksize * 3];
+  T temp;
+  int for_pos;
+  check = false;
+  //存储数据 把所有相同的data数据存入其中
+  while (cur != nullptr) {
+    //循环中执行 可能有好几个块中存放了相同的数据
+    //TODO 采用全部读入，二分比较的方法
+    if (strcmp(cur->min.key, key) <= 0 && strcmp(key, cur->max.key) <= 0) {
+      block_file.seekg(cur->cur, std::ios::beg);
+      //key值在当前块的范围
+      block_file.read(reinterpret_cast<char *>(pools), sizeof(Data) * cur->now_size);
+      for (int i = 0; i < cur->now_size; i++) {
+        if (strcmp(pools[i].key, key) == 0) {
+          temp = pools[i].value;
+          check = true;
+          pos = cur ->cur + i * sizeof(Data);
+          break;
+        }
+      }
+    }
+    cur = cur->next;
+  }
+  delete[] pools;
+  return temp;
+}
+//TODO 有没有必要
+/// 重载函数 不需要返回pos
+/// @param key
+/// @param check
+/// @return
 template<typename T, int len,int info>
 T Index<T, len, info>::findData(const char *key, bool &check) {
   Block *cur = head;
@@ -261,49 +300,19 @@ T Index<T, len, info>::findData(const char *key, bool &check) {
     cur = cur->next;
   }
   delete[] pools;
-
   return temp;
 }
 
 template<typename T, int len,int info>
-bool Index<T,len , info>::updateData(const char * key,T value) {
-  Block *cur = head;
-  Data *pools = new Data[sqrBlocksize * 3];
-  Data temp;
-  strcpy(temp.key,key);
-  temp.value = value;
-  int update_cur = -1;
-  //存储数据 把所有相同的data数据存入其中
-  while (cur != nullptr) {
-    //循环中执行 可能有好几个块中存放了相同的数据
-    //TODO 采用全部读入，二分比较的方法
-    if (strcmp(cur->min.key, key) <= 0 && strcmp(key, cur->max.key) <= 0) {
-      block_file.seekg(cur->cur, std::ios::beg);
-      //key值在当前块的范围
-      block_file.read(reinterpret_cast<char *>(pools), sizeof(Data) * cur->now_size);
-      for (int i = 0; i < cur->now_size; i++) {
-        if (strcmp(pools[i].key, key) == 0) {
-          update_cur = i;
-          break;
-        }
-      }
-    }
-    cur = cur->next;
-  }
-  delete[] pools;
-  if(update_cur != -1) {
-    block_file.seekg(cur->cur + update_cur * sizeof(Data), std::ios::beg);
-    block_file.write(reinterpret_cast<char *>(&temp), sizeof(Data) );
-    return true;
-  }
-  else {
-    return false;
-  }
+bool Index<T,len , info>::updateData(const char * key,T & value,int pos ) {
+  block_file.seekp(pos,std::ios::beg);
+  block_file.write(reinterpret_cast<char*>(&value));
+  return true;
 }
 
 //删除数据
 template<typename T, int len,int info>
-bool Index<T, len,info>::deleteData(const char *key, T value) {
+bool Index<T, len,info>::deleteData(const char *key, T & value) {
   Block *cur = head;
   Block *forcur = head;
   Data *pool = new Data[3 * sqrBlocksize];

@@ -9,7 +9,6 @@
 #include<fstream>
 #include<algorithm>
 
-#include"user.hpp"
 
 
 
@@ -126,14 +125,16 @@ public:
   void Split(Block *);
 
   //在当前块中插入数据
-  bool insertData(const char *, T value);
+  bool insertData(const char *, T& value);
 
   //在当前块中删除块
-  bool deleteData(const char *, T value);
+  bool deleteData(const char *, T& value);
 
-  bool updateData(const char *,T value);
+  bool updateData(const char *,T& value,int pos);
   //在当前块中寻找数据
   T findData(const char *,bool &);
+  /// 在当前块中寻找数据
+  T findData(const char *,bool &,int &);
 };
 
 
@@ -147,75 +148,95 @@ private:
   std::string file_name;
   int sizeofT = sizeof(T);
   int max_size = 0;
+  int offset = sizeof(int) * info_len;
+  bool isFirst ;
 public:
   LogFile() = default;
 
-  LogFile(const std::string& file_name) : file_name(file_name) {}
-
+  LogFile(const std::string& file_name) : file_name(file_name) {
+    file.open(file_name,std::ios::in|std::ios::out|std::ios::binary);
+    isFirst = false;
+    if(!file.is_open()) {
+      file.open(file_name,std::ios::out|std::ios::binary);
+      file.close();
+      file.open(file_name,std::ios::in|std::ios::out|std::ios::binary);
+      isFirst = true;
+    }
+  }
+  ~LogFile() {
+    file.close();
+  }
+  bool firstOpen() {
+    return isFirst;
+  }
+  //除去info的offset
+  int getOffset() {
+    return offset;
+  }
   void initialise(const std::string &FN = "") {
     if (FN != "") file_name = FN;
-    file.open(file_name, std::ios::out|std::ios::binary);
+    //file.open(file_name, std::ios::out|std::ios::binary);
     int tmp = 0;
     for (int i = 0; i < info_len; ++i)
       file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
-    file.close();
+    //file.close();
   }
-
   //读出第n个int的值赋给tmp，1_base
   void get_info(int &tmp, int n) {
     if (n > info_len) return;
-    file.open(file_name,std::ios::binary|std::ios::in|std::ios::out);
+    //file.open(file_name,std::ios::binary|std::ios::in|std::ios::out);
     /* your code here */
     int t;
     file.seekg((n - 1) * sizeof(int),std::ios::beg);
     file.read(reinterpret_cast<char*>(&tmp),sizeof(int));
-    file.close();
+    //file.close();
   }
-
   //将tmp写入第n个int的位置，1_base
   void write_info(int tmp, int n) {
     if (n > info_len) return;
     /* your code here */
-    file.open(file_name,std::ios::binary|std::ios::in|std::ios::out);
+    //file.open(file_name,std::ios::binary|std::ios::in|std::ios::out);
     file.seekp((n - 1)*sizeof(int));
     file.write(reinterpret_cast<char *>(&tmp),sizeof(int));
-    file.close();
+    //file.close();
 
   }
-
   //在文件合适位置写入类对象t，并返回写入的位置索引index
   //位置索引意味着当输入正确的位置索引index，在以下三个函数中都能顺利的找到目标对象进行操作
   //位置索引index可以取为对象写入的起始位置
   int write(T &t) {
     /* your code here */
-    file.open(file_name,std::ios::binary|std::ios::in|std::ios::out);
+    //file.open(file_name,std::ios::binary|std::ios::in|std::ios::out);
     file.seekp(0,file.end);
     int index = file.tellp();
     file.write(reinterpret_cast<char*>(&t),sizeofT);
-    file.close();
+    //file.close();
     max_size++;
     return index;
-
   }
-
   //用t的值更新位置索引index对应的对象，保证调用的index都是由write函数产生
   void update(T &t, const int index) {
     /* your code here */
-    file.open(file_name,std::ios::in|std::ios::binary|std::ios::out);
+    //file.open(file_name,std::ios::in|std::ios::binary|std::ios::out);
     file.seekp(index);
     file.write(reinterpret_cast<char*>(&t),sizeofT);
-    file.close();
+    //file.close();
   }
-
   //读出位置索引index对应的T对象的值并赋值给t，保证调用的index都是由write函数产生
   void read(T &t, const int index) {
-
-    file.open(file_name,std::ios::binary|std::ios::in);
+    //file.open(file_name,std::ios::binary|std::ios::in);
     file.seekg(index);
     file.read(reinterpret_cast<char*>(&t),sizeofT);
-    file.close();
+    //file.close();
   }
-
+  //注意这里传入的n读的块数
+  void read_block(T * a,int n,int total) {
+    //向右偏移到读的位置
+    file.seekp(offset + (total - n) * sizeofT);
+    for(int i = 0;i<n;i++) {
+      file.read(reinterpret_cast<char *>(a),sizeofT * n);
+    }
+  }
   //删除位置索引index对应的对象(不涉及空间回收时，可忽略此函数)，保证调用的index都是由write函数产生
   void Delete(int index) {
     /* your code here */
