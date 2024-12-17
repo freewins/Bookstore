@@ -63,57 +63,15 @@ private:
 
 public:
 
-  Index(int blocksize, const std::string &indexname, const std::string &blockname): Blocksize(blocksize),
-    Indexnmame(indexname), Blockname(blockname) {
-    sqrBlocksize = sqrt(Blocksize);
-    index_file.open(indexname, std::ios::out | std::ios::binary | std::ios::in);
-    if (!index_file.is_open()) {
-      index_file.open(indexname, std::ios::out);
-      index_file.close();
-      index_file.open(indexname, std::ios::out | std::ios::binary | std::ios::in);
-    }
-    index_file.close();
-    block_file.open(blockname, std::ios::out | std::ios::binary | std::ios::in);
-    if (!block_file.is_open()) {
-      block_file.open(blockname, std::ios::out);
-      block_file.close();
-      block_file.open(blockname, std::ios::out | std::ios::binary | std::ios::in);
-    }
-    block_file.close();
-    offset = info * sizeof(int);
-  }
+  Index(int blocksize, const std::string &indexname, const std::string &blockname);
 
-  ~Index() {
-    //析构 首先是要把所有链表存储到Index里面 然后进行析构
-    block_file.close();
-    Block *cur = head;
-    Block *delete_p;
-    //把Index文件覆写
-    index_file.open(Indexnmame, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
-    index_file.seekp(0, std::ios::beg);
-    index_file.write(reinterpret_cast<char *>(&Blockcount), sizeof(int));
-    for(int i = 1;i<info;i++) {//写入info
-      index_file.write(reinterpret_cast<char *>(&info_data[i]), sizeof(int));
-    }
-    index_file.seekp(offset,std::ios::beg);
-    for (int i = 0;i<Blockcount;i++)  {
-      index_file.write(reinterpret_cast<char *>(cur), sizeof(Block));
-      delete_p = cur;
-      cur = cur->next;
-      delete delete_p;
-    }
-    index_file.close();
-  }
+  ~Index();
 
   //获得第n个info
-  int getInfo(int n) {
-    return info_data[n];
-  }
+  int getInfo(int n);
 
   //修改对应位置的info
-  void updateInfo(int n,int val) {
-    info_data[n] = val;
-  }
+  void updateInfo(int n,int val);
 
   //初始化 读入所有Index
   void Initialise();
@@ -130,11 +88,13 @@ public:
   //在当前块中删除块
   bool deleteData(const char *, T& value);
 
-  bool updateData(const char *,T& value,int pos);
+  bool updateData(T& value,int pos);
   //在当前块中寻找数据
   T findData(const char *,bool &);
   /// 在当前块中寻找数据
   T findData(const char *,bool &,int &);
+  //
+  void showAll(char *,int );
 };
 
 

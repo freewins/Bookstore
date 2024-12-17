@@ -42,7 +42,7 @@ public:
     userIndex.Initialise();//首先初始化文件
     total_user = userIndex.getInfo(1);//数量统一放在文件的第一个位置处
     if(total_user == 0) {
-      //第一次启动程序，需要创建超级用户
+      addUser("root","root",7,"sjtu");
     }
   }
   ~user() {
@@ -52,18 +52,17 @@ public:
   ///
   /// @param password 可以为空
   /// @return 登陆成功 or 失败
-  bool login(char * ,char * password = nullptr);
+  bool login(const char * , int & privilege,const char * password = nullptr);
 
   ///退出登录
   ///这个感觉在user里面没有什么用，先当一个空函数用吧 或者在main()里面实现
   bool logout();
 
-
   /// 权限 数量检测在外部函数进行
   /// @param newPassword 可以为空 nullptr 要特判
   /// @param currentPassword  可以传入
   /// @return 操作成功与失败
-  bool modifyPasswd(char *,char * newPassword,char * currentPassword = "");
+  bool modifyPasswd(const char * userId,const char * newPassword,const char * currentPassword = nullptr);
 
   /// 权限 参数数据量在外部函数进行
   /// @param userId 传入用户ID 重复性检查在本函数进行
@@ -71,12 +70,12 @@ public:
   /// @param privilege 传入privilege 合法性检查在外部函数进行
   /// @param password 传入password 有无在外部函数进行
   /// @return 操作成功或失败
-  bool addUser(char * userId , char * userName,int privilege,char * password="" );
+  bool addUser(const char * userId , const char * userName,int privilege,const char * password= nullptr );
 
   /// 权限检测在外部进行
   /// @param userId
   /// @return 删除成功与否
-  bool daleteUser(char * userId );
+  bool daleteUser(const char * userId );
 };
 
 

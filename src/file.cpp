@@ -10,27 +10,83 @@
 #include<vector>
 #include<algorithm>
 
+template<typename T, int len, int info>
+Index<T, len, info>::Index(int blocksize, const std::string &indexname, const std::string &blockname): Blocksize(blocksize),
+    Indexnmame(indexname), Blockname(blockname) {
+  sqrBlocksize = sqrt(Blocksize);
+  index_file.open(indexname, std::ios::out | std::ios::binary | std::ios::in);
+  if (!index_file.is_open()) {
+    index_file.open(indexname, std::ios::out);
+    index_file.close();
+    index_file.open(indexname, std::ios::out | std::ios::binary | std::ios::in);
+  }
+  index_file.close();
+  block_file.open(blockname, std::ios::out | std::ios::binary | std::ios::in);
+  if (!block_file.is_open()) {
+    block_file.open(blockname, std::ios::out);
+    block_file.close();
+    block_file.open(blockname, std::ios::out | std::ios::binary | std::ios::in);
+  }
+  block_file.close();
+  offset = info * sizeof(int);
+}
+
+template<typename T, int len, int info>
+Index<T, len, info>::~Index() {
+  //析构 首先是要把所有链表存储到Index里面 然后进行析构
+  block_file.close();
+  Block *cur = head;
+  Block *delete_p;
+  //把Index文件覆写
+  index_file.open(Indexnmame, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
+  index_file.seekp(0, std::ios::beg);
+  index_file.write(reinterpret_cast<char *>(&Blockcount), sizeof(int));
+  for (int i = 1; i < info; i++) {
+    //写入info
+    index_file.write(reinterpret_cast<char *>(&info_data[i]), sizeof(int));
+  }
+  index_file.seekp(offset, std::ios::beg);
+  for (int i = 0; i < Blockcount; i++) {
+    index_file.write(reinterpret_cast<char *>(cur), sizeof(Block));
+    delete_p = cur;
+    cur = cur->next;
+    delete delete_p;
+  }
+  index_file.close();
+}
+
+template<typename T, int len, int info>
+int Index<T, len, info>::getInfo(int n) {
+  return info_data[n];
+}
+
+template<typename T, int len, int info>
+void Index<T, len, info>::updateInfo(int n, int val) {
+  info_data[n] = val;
+}
+
 //把索引中的文件读到内存里
-template<typename T, int len,int info>
-void Index<T, len,info>::Initialise() {
+template<typename T, int len, int info>
+void Index<T, len, info>::Initialise() {
   Block *temp = new Block;
   temp->cur = -1;
   index_file.open(Indexnmame, std::ios::in | std::ios::binary);
   index_file.seekp(0, std::ios::end);
   bool noBlock = false;
-  if (index_file.tellg() == 0) {//文件刚刚创建 需要写info
+  if (index_file.tellg() == 0) {
+    //文件刚刚创建 需要写info
     noBlock = true;
     int temp = 0;
-    for(int i = 0;i<info;i++) {
-      block_file.write(reinterpret_cast<char *>(&temp),sizeof(int));
+    for (int i = 0; i < info; i++) {
+      block_file.write(reinterpret_cast<char *>(&temp), sizeof(int));
       info_data[i] = temp;
     }
   } else {
     //开头部分放 Blockcount
     index_file.seekg(0, std::ios::beg);
     index_file.read(reinterpret_cast<char *>(&Blockcount), sizeof(int));
-    for(int i = 1;i<info;i++) {
-      index_file.read(reinterpret_cast<char *>(&info_data[i]),sizeof(int));
+    for (int i = 1; i < info; i++) {
+      index_file.read(reinterpret_cast<char *>(&info_data[i]), sizeof(int));
     }
     if (Blockcount == 0) {
       noBlock = true;
@@ -69,8 +125,8 @@ void Index<T, len,info>::Initialise() {
 }
 
 //进行合并
-template<typename T, int len,int info>
-void Index<T, len,info>::Merge(Block *cur, Block *forcur) {
+template<typename T, int len, int info>
+void Index<T, len, info>::Merge(Block *cur, Block *forcur) {
   //采用递归写法 进行一次次连续调用
   //总体来说就是都读入到内存里面然后进行放置
   //可能为头指针或者是在末尾
@@ -138,8 +194,8 @@ void Index<T, len,info>::Merge(Block *cur, Block *forcur) {
 }
 
 //进行裂块
-template<typename T, int len,int info >
-void Index<T, len,info>::Split(Block *cur) {
+template<typename T, int len, int info>
+void Index<T, len, info>::Split(Block *cur) {
   block_file.seekg(cur->cur, std::ios::beg);
   Data *temp_arr = new Data[cur->now_size + 4];
   Block *new_block = new Block; //创建新块
@@ -178,8 +234,8 @@ void Index<T, len,info>::Split(Block *cur) {
 //插入数据
 //TODO
 
-template<typename T, int len,int info>
-bool Index<T, len,info>::insertData(const char *key, T &value) {
+template<typename T, int len, int info>
+bool Index<T, len, info>::insertData(const char *key, T &value) {
   Block *cur = nullptr;
   Block *forcur = nullptr;
   Block *p = head;
@@ -241,18 +297,17 @@ bool Index<T, len,info>::insertData(const char *key, T &value) {
 /// @param check 检测是否找到
 /// @param pos 返回找到对象的文件位置，仅为了在update的时候调用
 /// @return
-template<typename T, int len,int info>
-T Index<T, len, info>::findData(const char *key, bool &check,int & pos) {
+template<typename T, int len, int info>
+T Index<T, len, info>::findData(const char *key, bool &check, int &pos) {
   Block *cur = head;
   Data *pools = new Data[sqrBlocksize * 3];
   T temp;
-  int for_pos;
   check = false;
   //存储数据 把所有相同的data数据存入其中
   while (cur != nullptr) {
     //循环中执行 可能有好几个块中存放了相同的数据
     //TODO 采用全部读入，二分比较的方法
-    if (strcmp(cur->min.key, key) <= 0 && strcmp(key, cur->max.key) <= 0) {
+    if (strcmp(cur->min, key) <= 0 && strcmp(key, cur->max) <= 0) {
       block_file.seekg(cur->cur, std::ios::beg);
       //key值在当前块的范围
       block_file.read(reinterpret_cast<char *>(pools), sizeof(Data) * cur->now_size);
@@ -260,7 +315,7 @@ T Index<T, len, info>::findData(const char *key, bool &check,int & pos) {
         if (strcmp(pools[i].key, key) == 0) {
           temp = pools[i].value;
           check = true;
-          pos = cur ->cur + i * sizeof(Data);
+          pos = cur->cur + i * sizeof(Data);
           break;
         }
       }
@@ -270,12 +325,12 @@ T Index<T, len, info>::findData(const char *key, bool &check,int & pos) {
   delete[] pools;
   return temp;
 }
-//TODO 有没有必要
+
 /// 重载函数 不需要返回pos
 /// @param key
 /// @param check
 /// @return
-template<typename T, int len,int info>
+template<typename T, int len, int info>
 T Index<T, len, info>::findData(const char *key, bool &check) {
   Block *cur = head;
   Data *pools = new Data[sqrBlocksize * 3];
@@ -285,7 +340,7 @@ T Index<T, len, info>::findData(const char *key, bool &check) {
   while (cur != nullptr) {
     //循环中执行 可能有好几个块中存放了相同的数据
     //TODO 采用全部读入，二分比较的方法
-    if (strcmp(cur->min.key, key) <= 0 && strcmp(key, cur->max.key) <= 0) {
+    if (strcmp(cur->min, key) <= 0 && strcmp(key, cur->max) <= 0) {
       block_file.seekg(cur->cur, std::ios::beg);
       //key值在当前块的范围
       block_file.read(reinterpret_cast<char *>(pools), sizeof(Data) * cur->now_size);
@@ -303,16 +358,17 @@ T Index<T, len, info>::findData(const char *key, bool &check) {
   return temp;
 }
 
-template<typename T, int len,int info>
-bool Index<T,len , info>::updateData(const char * key,T & value,int pos ) {
-  block_file.seekp(pos,std::ios::beg);
-  block_file.write(reinterpret_cast<char*>(&value));
+template<typename T, int len, int info>
+//TODO 删掉这个参数
+bool Index<T, len, info>::updateData(T &value, int pos) {
+  block_file.seekp(pos, std::ios::beg);
+  block_file.write(reinterpret_cast<char *>(&value), sizeof(Data));
   return true;
 }
 
 //删除数据
-template<typename T, int len,int info>
-bool Index<T, len,info>::deleteData(const char *key, T & value) {
+template<typename T, int len, int info>
+bool Index<T, len, info>::deleteData(const char *key, T &value) {
   Block *cur = head;
   Block *forcur = head;
   Data *pool = new Data[3 * sqrBlocksize];
@@ -360,7 +416,7 @@ bool Index<T, len,info>::deleteData(const char *key, T & value) {
         }
         break;
       }
-    } else if (strcmp(temp.key,  cur->min) <0 ) {
+    } else if (strcmp(temp.key, cur->min) < 0) {
       break;
     }
     forcur = cur; //存储一下上一个位置的指针
@@ -368,6 +424,11 @@ bool Index<T, len,info>::deleteData(const char *key, T & value) {
   }
   delete[] pool;
   return exist;
+}
+
+
+template<typename T, int len, int info>
+void Index<T, len, info>::showAll(char *, int) {
 }
 
 #endif //MEMORYSEA_HPP
