@@ -5,8 +5,7 @@
 #ifndef LOGS_HPP
 #define LOGS_HPP
 #include<iostream>
-#include<iomanip>
-#include "file.hpp"
+#include "file.cpp"
 
 class logs {
 public:
@@ -77,7 +76,7 @@ private:
     char statement[60];
   };
 
-  std::time_t clock;
+
   int count;
   int now_cur;
   LogFile<SysLog> logSystem;

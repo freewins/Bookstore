@@ -1,6 +1,8 @@
 //
 // Created by Freewings on 2024/12/15.
 //
+#ifndef USER_CPP
+#define USER_CPP
 
 #include "user.hpp"
 
@@ -15,8 +17,7 @@ bool user::login(const char *userId, int &privilege, const char *password) {
         privilege = tmp.privilege;
         return true;
       } else return false;
-    }
-    else {
+    } else {
       privilege = tmp.privilege;
       return true;
     }
@@ -53,3 +54,6 @@ bool user::modifyPasswd(const char *userId, const char *newPassword, const char 
   }
   return false;
 }
+
+
+#endif

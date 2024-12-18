@@ -1,14 +1,16 @@
 //
 // Created by Freewings on 2024/12/6.
 //
-#include "file.hpp"
-#ifndef MEMORYSEA_HPP
-#define MEMORYSEA_HPP
+
+#ifndef FILE_CPP
+#define FILE_CPP
+
 #include<cmath>
 #include <cstring>
 #include<fstream>
 #include<vector>
 #include<algorithm>
+#include "file.hpp"
 
 template<typename T, int len, int info>
 Index<T, len, info>::Index(int blocksize, const std::string &indexname, const std::string &blockname): Blocksize(blocksize),
@@ -208,8 +210,8 @@ void Index<T, len, info>::Split(Block *cur) {
   //在当前位置写入前 1/2 的数据
   block_file.seekp(cur->cur, std::ios::beg);
   block_file.write(reinterpret_cast<char *>(temp_arr), sizeof(Data) * i);
-  strcpy(cur->max, temp_arr[i - 1]);
-  strcpy(cur->min, temp_arr[0]);
+  strcpy(cur->max, temp_arr[i - 1].key);
+  strcpy(cur->min, temp_arr[0].key);
   //在文件末尾写入
   block_file.seekp(tail->cur + sizeof(Data) * (2 * sqrBlocksize + 16), std::ios::beg);
   new_block->cur = Index::block_file.tellp();
@@ -288,6 +290,7 @@ bool Index<T, len, info>::insertData(const char *key, T &value) {
     Split(cur);
   }
   delete [] pools;
+  return true;
 }
 
 //寻找数据
@@ -395,9 +398,9 @@ bool Index<T, len, info>::deleteData(const char *key, T &value) {
           if (!startSize) {
             strcpy(cur->max, pool[0].key);
           }
-          cur->min.key[0] = '\0';
+          cur->min[0] = '\0';
         } else if (cur->now_size == 1) {
-          cur->max.key[0] = '\0';
+          cur->max[0] = '\0';
           cur->now_size = 0;
         } else {
           if (startSize == 0) {
@@ -431,4 +434,4 @@ template<typename T, int len, int info>
 void Index<T, len, info>::showAll(const char *, int) {
 }
 
-#endif //MEMORYSEA_HPP
+#endif

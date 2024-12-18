@@ -3,12 +3,10 @@
 #include<vector>
 #include<stack>
 #include<exception>
-#include<map>
-#include<time.h>
-#include "user.hpp"
-#include"book.hpp"
-#include "file.hpp"
-#include "logs.hpp"
+#include "user.cpp"
+#include"book.cpp"
+#include "file.cpp"
+#include "logs.cpp"
 //保存系统状态
 
 struct aBook {
@@ -18,6 +16,7 @@ struct aBook {
   aBook &operator=(const aBook &a) {
     strcpy(ISBN, a.ISBN);
     this->_book = a._book;
+    return *this;
   }
 };
 
@@ -31,14 +30,14 @@ struct Statement {
 enum INFO { ISBN, NAME, AUTHOR, KETWORD, PRICE, dFualt };
 
 const std::string Path[10] = {
-  ".\\Data\\Index\\userInfoIndex.index",
-  ".\\Data\\Index\\bookInfoIndex.index",
-  ".\\Data\\basicInfo.data",
-  ".\\Data\\bookInfo.data",
-  ".\\Data\\userInfo.data",
-  ".\\Data\\syslogInfo.data",
-  ".\\Data\\operatorInfo.data",
-  ".\\Data\\profitInfo.data"
+  "../Data/Index/userInfoIndex.index",
+  "../Data/Index/bookInfoIndex.index",
+  "../Data/basicInfo.data",
+  "../Data/bookInfo.data",
+  "../Data/userInfo.data",
+  "../Data/syslogInfo.data",
+  "../Data/operatorInfo.data",
+  "../Data/profitInfo.data"
 };
 
 class defualtError : public std::exception {
@@ -64,8 +63,6 @@ void Run(user &user_, book &book_, Profit &_log_profit,
          SystemLog &_log_sys, Operator &_log_operator);
 
 void splitOrder(std::string &input, std::vector<std::string> &orders);
-
-
 
 
 int getInt(const std::string &number) {
@@ -119,6 +116,7 @@ double getDouble(const std::string &number) {
     }
     return flag * ans;
   }
+  return -1;
 }
 
 INFO getInfoType(const std::string &op, std::string &data) {
@@ -208,7 +206,6 @@ void Run(user &user_, book &book_, Profit &_log_profit,
   int l; //指令参数计数器
   while (true) {
     try {
-      std::cin >> input;
       std::getline(std::cin, input);
       if (input == "") {
         continue;
@@ -323,7 +320,6 @@ void Run(user &user_, book &book_, Profit &_log_profit,
             strcpy(book_tmp.ISBN, orders[1].c_str());
           }
         } else if (orders[0] == "modify") {
-
           if (now_privilege < 3 || now_bookPos == -1) {
             throw defualtError("Invalid\n");
           } else {
@@ -331,18 +327,17 @@ void Run(user &user_, book &book_, Profit &_log_profit,
             std::string tmp;
             INFO tmp_info;
             std::vector<INFO> infos;
-            for(int i = 1;i<l;i++) {
-              tmp_info = getInfoType(orders[i],tmp);
-              if(tmp_info == INFO::dFualt) {
+            for (int i = 1; i < l; i++) {
+              tmp_info = getInfoType(orders[i], tmp);
+              if (tmp_info == INFO::dFualt) {
                 throw defualtError("Invalid\n");
-              }
-              else {
+              } else {
                 infos.push_back(tmp_info);
                 datas.push_back(tmp);
               }
             }
             for (int i = 1; i < l; i++) {
-              tmp_info = infos[i-1];
+              tmp_info = infos[i - 1];
 
               switch (tmp_info) {
                 case INFO::dFualt: {
@@ -350,7 +345,7 @@ void Run(user &user_, book &book_, Profit &_log_profit,
                   break;
                 }
                 case INFO::ISBN: {
-                  if (book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), 1, now_bookPos)) {
+                  if (book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), now_bookPos, 1)) {
                     strcpy(book_tmp.ISBN, datas[i - 1].c_str());
                   } else {
                     throw defualtError("Invalid\n");
@@ -358,19 +353,19 @@ void Run(user &user_, book &book_, Profit &_log_profit,
                   break;
                 }
                 case INFO::NAME: {
-                  if (!book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), 2, now_bookPos)) {
+                  if (!book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), now_bookPos, 2)) {
                     throw defualtError("Invalid\n");
                   }
                   break;
                 }
                 case INFO::AUTHOR: {
-                  if (!book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str()), 3, now_bookPos) {
+                  if (!book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), now_bookPos, 3)) {
                     throw defualtError("Invalid\n");
                   }
                   break;
                 }
                 case INFO::KETWORD: {
-                  if (!book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), 4, now_bookPos)) {
+                  if (!book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), now_bookPos, 4)) {
                     throw defualtError("Invalid\n");
                   }
                   break;
@@ -476,8 +471,13 @@ int main() {
   Profit _log_profit(Path[7]);
   SystemLog _log_sys(Path[5]);
   Operator _log_operator(Path[6]);
+  FILE *p = nullptr;
+  //freopen("G:/ACM_CLASS/Bookstore/testcases/basic/testcase1.in","r",stdin);
+
+  //freopen("G:/ACM_CLASS/Bookstore/testcases/basic/testcase1-2.out","w",stdout);
   try {
     Run(_user, _book, _log_profit, _log_sys, _log_operator);
   } catch (...) {
   }
+  return 0;
 }

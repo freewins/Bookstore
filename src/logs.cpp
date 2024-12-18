@@ -1,7 +1,8 @@
 //
 // Created by Freewings on 2024/12/15.
 //
-
+#ifndef LOGS_CPP
+#define LOGS_CPP
 #include "logs.hpp"
 
 
@@ -100,3 +101,4 @@ SystemLog::~SystemLog() {
   logSystem.write_info(now_cur,1);
 }
 
+#endif
