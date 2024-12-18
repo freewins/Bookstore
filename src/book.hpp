@@ -42,7 +42,7 @@ public:
       price = a.price;
       amount = a.amount;
     }
-    bool findKey(char * des) {
+    bool findKey(const char * des) {
       char tmp[61];
       for(int i = 0,j = 0;i<strlen(keyWord);i++) {
         int k = 0;
@@ -56,7 +56,7 @@ public:
       }
       return false;
     }
-    void insertKey(char * des) {
+    void insertKey(const char * des) {
       strcat(keyWord,des);
       int j = strlen(keyWord);
       keyWord[j] = '1';
@@ -72,12 +72,12 @@ public:
   ~book() {
     bookIndex.updateInfo(1,total_book);
   }
-  bool buy(char * ISBN ,int & quantity , double & total);
-  bool show_book(char * find_key,int mode = 0);
+  bool buy(const char * ISBN ,int & quantity , double & total);
+  bool show_book(const char * find_key,int mode = 0);
 
-  bool selete(char * ISBN,int  & pos);
+  bool selete(Book & tmp,const char * ISBN,int  & pos);
   bool modify(Book &,double & price,int & pos);
-  bool modify(Book &,char * ,char * ISBN,int mode = 0,int & pos);
+  bool modify(Book &,const char * ISBN,const char * new_data,int mode = 0,int & pos);
   bool import(Book &,int quantity,double total_cost,int & pos);
 };
 

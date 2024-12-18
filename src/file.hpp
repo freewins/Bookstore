@@ -94,7 +94,7 @@ public:
   /// 在当前块中寻找数据
   T findData(const char *,bool &,int &);
   //
-  void showAll(char *,int );
+  void showAll(const char *,int );
 };
 
 

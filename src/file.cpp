@@ -428,7 +428,7 @@ bool Index<T, len, info>::deleteData(const char *key, T &value) {
 
 
 template<typename T, int len, int info>
-void Index<T, len, info>::showAll(char *, int) {
+void Index<T, len, info>::showAll(const char *, int) {
 }
 
 #endif //MEMORYSEA_HPP
