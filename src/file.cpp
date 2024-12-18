@@ -78,10 +78,10 @@ void Index<T, len, info>::Initialise() {
   if (index_file.tellg() == 0) {
     //文件刚刚创建 需要写info
     noBlock = true;
-    int temp = 0;
+    int tmp = 0;
     for (int i = 0; i < info; i++) {
-      block_file.write(reinterpret_cast<char *>(&temp), sizeof(int));
-      info_data[i] = temp;
+      index_file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
+      info_data[i] = tmp;
     }
   } else {
     //开头部分放 Blockcount
@@ -144,13 +144,13 @@ void Index<T, len, info>::Merge(Block *cur, Block *forcur) {
   //进行合并
   if (cur->now_size + forcur->now_size < 2 * sqrBlocksize + 4) {
     Data *pools = new Data[3 * sqrBlocksize];
-    block_file.seekg(cur->cur, std::ios::beg);
+    block_file.seekg(cur->cur , std::ios::beg);
     block_file.read(reinterpret_cast<char *>(pools), sizeof(Data) * cur->now_size);
     // for (int i = 0; i < cur->now_size; i++) {
     //   block_file.read(reinterpret_cast<char *>(&pools[i]), sizeof(Data));
     // }
     //定位到块的末尾
-    block_file.seekp(forcur->cur + sizeof(Data) * forcur->now_size, std::ios::beg);
+    block_file.seekp(forcur->cur  + sizeof(Data) * forcur->now_size, std::ios::beg);
     block_file.write(reinterpret_cast<char *>(pools), sizeof(Data) * cur->now_size);
     // for (int i = 0; i < cur->now_size; i++) {
     //   block_file.write(reinterpret_cast<char *>(&pools[i]), sizeof(Data));
@@ -198,7 +198,7 @@ void Index<T, len, info>::Merge(Block *cur, Block *forcur) {
 //进行裂块
 template<typename T, int len, int info>
 void Index<T, len, info>::Split(Block *cur) {
-  block_file.seekg(cur->cur, std::ios::beg);
+  block_file.seekg(cur->cur , std::ios::beg);
   Data *temp_arr = new Data[cur->now_size + 4];
   Block *new_block = new Block; //创建新块
   int i = cur->now_size / 2;
@@ -208,7 +208,7 @@ void Index<T, len, info>::Split(Block *cur) {
   //std::sort(temp_arr, temp_arr + cur->now_size);
 
   //在当前位置写入前 1/2 的数据
-  block_file.seekp(cur->cur, std::ios::beg);
+  block_file.seekp(cur->cur , std::ios::beg);
   block_file.write(reinterpret_cast<char *>(temp_arr), sizeof(Data) * i);
   strcpy(cur->max, temp_arr[i - 1].key);
   strcpy(cur->min, temp_arr[0].key);
@@ -282,7 +282,7 @@ bool Index<T, len, info>::insertData(const char *key, T &value) {
   std::sort(pools, pools + cur->now_size);
   block_file.seekp(cur->cur, std::ios::beg);
   block_file.write(reinterpret_cast<char *>(pools), sizeof(Data) * cur->now_size);
-  if (strcmp(key, cur->min)) {
+  if (strcmp(key, cur->min) < 0) {
     strcpy(cur->min, key);
   }
   //TODO 可以直接把pools 的指针传过去，避免过多内存消耗
@@ -365,7 +365,11 @@ template<typename T, int len, int info>
 //TODO 删掉这个参数
 bool Index<T, len, info>::updateData(T &value, int pos) {
   block_file.seekp(pos, std::ios::beg);
-  block_file.write(reinterpret_cast<char *>(&value), sizeof(Data));
+  Data tmp;
+  block_file.read(reinterpret_cast<char *>(&tmp),sizeof(Data));
+  tmp.value = value;
+  block_file.seekp(pos, std::ios::beg);
+  block_file.write(reinterpret_cast<char *>(&tmp), sizeof(Data));
   return true;
 }
 

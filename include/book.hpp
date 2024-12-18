@@ -4,7 +4,9 @@
 
 #ifndef BOOK_HPP
 #define BOOK_HPP
+#include<set>
 #include <string.h>
+#include<vector>
 #include "file.cpp"
 
 
@@ -41,7 +43,6 @@ public:
       amount = a.amount;
       return *this;
     }
-
     bool findKey(const char *des) {
       char tmp[61];
       for (int i = 0, j = 0; i < strlen(keyWord); i++) {
@@ -53,15 +54,52 @@ public:
         if (strcmp(tmp, des) == 0) {
           return true;
         }
+        i = j;
       }
       return false;
     }
-
-    void insertKey(const char *des) {
-      strcat(keyWord, des);
-      int j = strlen(keyWord);
-      keyWord[j] = '1';
-      keyWord[j + 1] = '\0';
+    bool insertKey(const char *des) {
+      std::vector<std::string> newKey;
+      std::string tmp;
+      std::string _new(des);
+      int cur = _new.find('|');
+      int forcur = 0;
+      if(cur == std::string::npos) {
+        eraseSpace(_new);
+        strcpy(keyWord,_new.c_str());
+        return true;
+      }
+      else {
+        do {
+          if(forcur != 0) forcur++;
+          cur = _new.find('|',forcur);
+          tmp = _new.substr(forcur,cur - forcur );
+          eraseSpace(tmp);
+          for(int i = 0;i<newKey.size();i++) {
+            if(tmp == newKey[i]) {
+              return false;
+            }
+          }
+          newKey.push_back(tmp);
+          forcur = cur;
+        }while(forcur!= std::string::npos);
+        int k = 0;
+        for(int i = 0 , j = 0;i<newKey.size();i++) {
+          for(j = 0;j<newKey[i].size();j++) {
+            keyWord[k++] = newKey[i][j];
+          }
+          if(i != newKey.size() - 1)keyWord[k++] = '|';
+        }
+        keyWord[k] = '\0';
+        return true;
+      }
+      return false;
+    }
+    void eraseSpace(std::string & a) {
+      int i = 0,j = a.size() -1;
+      while(a[i] == ' ')i++;
+      while(a[j] == ' ')j++;
+      a= a.substr(i,j - i + 1);
     }
   };
 

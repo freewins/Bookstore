@@ -27,7 +27,7 @@ private:
 public:
   Profit(std::string profit_path_);
   ~Profit();
-  void save(int n, double profit);
+  void save(double profit);
 
   bool read(int k = -1);
 };

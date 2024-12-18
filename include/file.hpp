@@ -123,6 +123,11 @@ public:
       file.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
       isFirst = true;
     }
+    else {
+      if(file.tellg() == 0) {
+        isFirst = true;
+      }
+    }
   }
 
   ~LogFile() {
@@ -142,6 +147,7 @@ public:
     if (FN != "") file_name = FN;
     //file.open(file_name, std::ios::out|std::ios::binary);
     int tmp = 0;
+    file.seekp(0,std::ios::beg);
     for (int i = 0; i < info_len; ++i)
       file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
     //file.close();
@@ -175,6 +181,10 @@ public:
     /* your code here */
     //file.open(file_name,std::ios::binary|std::ios::in|std::ios::out);
     file.seekp(0, file.end);
+    if(!file.good()) {
+      file.clear();
+      file.seekp(0,file.end);
+    }
     int index = file.tellp();
     file.write(reinterpret_cast<char *>(&t), sizeofT);
     //file.close();
@@ -203,9 +213,9 @@ public:
   void read_block(T *a, int n, int total) {
     //向右偏移到读的位置
     file.seekp(offset + (total - n) * sizeofT);
-    for (int i = 0; i < n; i++) {
+    //for (int i = 0; i < n; i++) {
       file.read(reinterpret_cast<char *>(a), sizeofT * n);
-    }
+    //}
   }
 
   //删除位置索引index对应的对象(不涉及空间回收时，可忽略此函数)，保证调用的index都是由write函数产生

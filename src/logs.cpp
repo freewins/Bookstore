@@ -5,7 +5,6 @@
 #define LOGS_CPP
 #include "logs.hpp"
 
-
 Profit::Profit(std::string profit_path_) : logProgift(profit_path_) {
   if (logProgift.firstOpen()) {
     logProgift.initialise();
@@ -22,7 +21,7 @@ Profit::~Profit() {
   logProgift.write_info(now_cur,1);
 }
 
-void Profit::save(int n, double profit) {
+void Profit::save(double profit) {
   count++;
   now_cur = logProgift.write(profit);
 }
@@ -31,19 +30,15 @@ bool Profit::read(int k) {
   double income = 0;
   double outcome = 0;
   if (k == -1) {
-    if (count == 0) {
-      printf("+ %.2lf - %.2lf\n", income, outcome);
-      return true;
-    }
     k = count;
+  }
+  if (k == 0) {
+    std::cout << "\n";
+    return true;
   }
   if (k > count) {
     return false;
   } else {
-    if (count == 0) {
-      std::cout << "\n";
-      return true;
-    }
     //要读入全部的数据log
     //TODO 写一个读特定长度数据的函数
     double *pool = new double[k + 2];
@@ -54,6 +49,9 @@ bool Profit::read(int k) {
       } else {
         outcome += pool[i];
       }
+    }
+    if(outcome < 0) {
+      outcome = -outcome;
     }
     printf("+ %.2lf - %.2lf\n", income, outcome);
     delete[] pool;

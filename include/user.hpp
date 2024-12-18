@@ -19,8 +19,8 @@ private:
     int privilege;
 
     User &operator=(const User &a) {
-      strcmp(password, a.password);
-      strcmp(username, a.username);
+      strcpy(password, a.password);
+      strcpy(username, a.username);
       privilege = a.privilege;
       return *this;
     }
