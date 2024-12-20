@@ -510,13 +510,13 @@ void Run(user &user_, book &book_, Profit &_log_profit,
 
 
  int main() {
-  //   std::fstream file ;
-  //   for(int i = 0;i<8;i++) {
-  //     file.open(Path[i],std::ios::out|std::ios::trunc);
-  //     file.close();
-  //   }
-  // freopen("G:\\ACM_CLASS\\Bookstore\\testcases\\basic\\3.in","r",stdin);
-  // freopen("G:\\ACM_CLASS\\Bookstore\\testcases\\basic\\3.out","w",stdout);
+    std::fstream file ;
+    for(int i = 0;i<8;i++) {
+      file.open(Path[i],std::ios::out|std::ios::trunc);
+      file.close();
+    }
+  freopen("../testcases/basic/testcase3.in","r",stdin);
+  freopen("../testcases/basic/3.out","w",stdout);
   // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);

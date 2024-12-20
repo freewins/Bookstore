@@ -374,7 +374,7 @@ bool Index<T, len, info>::updateData(T &value, int pos) {
 }
 
 //删除数据
-template<typename T, int len, int info>
+template<class  T, int len, int info>
 bool Index<T, len, info>::deleteData(const char *key, T &value) {
   Block *cur = head;
   Block *forcur = head;
@@ -434,8 +434,153 @@ bool Index<T, len, info>::deleteData(const char *key, T &value) {
 }
 
 
-template<typename T, int len, int info>
+template<class T, int len, int info>
 void Index<T, len, info>::showAll(const char *, int) {
 }
+
+template<class T, int info_len>
+LogFile<T, info_len>::LogFile(const std::string &file_name) : file_name(file_name) {
+  file.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
+  isFirst = false;
+  if (!file.is_open()) {
+    file.open(file_name, std::ios::out | std::ios::binary);
+    file.close();
+    file.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
+    isFirst = true;
+  }
+  else {
+    if(file.tellg() == 0) {
+      isFirst = true;
+    }
+  }
+}
+
+template<class T, int info_len>
+LogFile<T, info_len>::~LogFile()  {
+  file.close();
+}
+
+
+template<class T, int info_len>
+bool LogFile<T, info_len>::firstOpen() {
+  return isFirst;
+}
+
+template<class T, int info_len>
+int LogFile<T, info_len>::getOffset() {
+  return offset;
+}
+
+template<class T, int info_len>
+void LogFile<T, info_len>::initialise(const std::string &FN)
+{
+    if (FN != "") file_name = FN;
+    //file.open(file_name, std::ios::out|std::ios::binary);
+    int tmp = 0;
+    file.seekp(0,std::ios::beg);
+    for (int i = 0; i < info_len; ++i)
+      file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
+    //file.close();
+}
+
+template<class T, int info_len>
+void LogFile<T, info_len>::get_info(int &tmp, int n) {
+  if (n > info_len) return;
+  //file.open(file_name,std::ios::binary|std::ios::in|std::ios::out);
+  /* your code here */
+  int t;
+  file.seekg((n - 1) * sizeof(int), std::ios::beg);
+  file.read(reinterpret_cast<char *>(&tmp), sizeof(int));
+  //file.close();
+}
+
+template<class T, int info_len>
+void LogFile<T, info_len>::write_info(int tmp, int n) {
+
+    if (n > info_len) return;
+    /* your code here */
+    //file.open(file_name,std::ios::binary|std::ios::in|std::ios::out);
+    file.seekp((n - 1) * sizeof(int));
+    file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
+    //file.close();
+
+}
+
+template<class T, int info_len>
+int LogFile<T, info_len>::write(T &t) {
+  /* your code here */
+  //file.open(file_name,std::ios::binary|std::ios::in|std::ios::out);
+  file.seekp(0, file.end);
+  if(!file.good()) {
+    file.clear();
+    file.seekp(0,file.end);
+  }
+  int index = file.tellp();
+  file.write(reinterpret_cast<char *>(&t), sizeofT);
+  //file.close();
+  max_size++;
+  return index;
+}
+
+template<class T, int info_len>
+void LogFile<T, info_len>::update(T &t, const int index) {
+  /* your code here */
+  //file.open(file_name,std::ios::in|std::ios::binary|std::ios::out);
+  file.seekp(index);
+  file.write(reinterpret_cast<char *>(&t), sizeofT);
+  //file.close();
+}
+
+template<class T, int info_len>
+void LogFile<T, info_len>::read(T &t, const int index)  {
+  //file.open(file_name,std::ios::binary|std::ios::in);
+  file.seekg(index);
+  file.read(reinterpret_cast<char *>(&t), sizeofT);
+  //file.close();
+}
+
+template<class T, int info_len>
+void LogFile<T, info_len>::read_block(T *a, int n, int total){
+  //向右偏移到读的位置
+  file.seekp(offset + (total - n) * sizeofT);
+  //for (int i = 0; i < n; i++) {
+  file.read(reinterpret_cast<char *>(a), sizeofT * n);
+  //}
+}
+
+template<class T, int info_len>
+void LogFile<T, info_len>::Delete(int index)  {
+  /* your code here */
+  file.open(file_name, std::ios::binary | std::ios::in | std::ios::out);
+  file.seekg(0);
+  int info[info_len + 2];
+  for (int i = 0; i < info_len; i++) {
+    file.read(reinterpret_cast<char *>(&info[i]), sizeof(int));
+  }
+  T buffer[max_size + 2];
+  T temp;
+  int cur = 0;
+  for (int i = 0; i < max_size; i++) {
+    if (file.tellg() == index) {
+      file.read(reinterpret_cast<char *>(&temp), sizeofT);
+      continue;
+    }
+    file.read(reinterpret_cast<char *>(&buffer[cur++]), sizeofT);
+  }
+  file.close();
+  file.open(file_name, std::ios::in | std::ios::out | std::ios::trunc);
+  file.seekp(0);
+  for (int i = 0; i < info_len; i++) {
+    file.write(reinterpret_cast<char *>(&info[i]), sizeof(int));
+  }
+  for (int i = 0; i < cur; i++) {
+    file.write(reinterpret_cast<char *>(&buffer[i]), sizeofT);
+  }
+  max_size = cur;
+  file.close();
+}
+
+
+
 
 #endif

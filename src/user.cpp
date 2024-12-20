@@ -11,10 +11,7 @@ bool user::login(const char *userId, int &privilege, const char *password) {
   bool is_find = false;
   User tmp = userIndex.findData(userId, is_find);
   if (is_find) {
-    if(privilege > tmp.privilege) {
-      privilege = tmp.privilege;
-      return  true;
-    }
+
     if (password != nullptr) {
       if (strcmp(password, tmp.password) == 0) {
         //TODO 需不需要密码的特判
@@ -24,6 +21,10 @@ bool user::login(const char *userId, int &privilege, const char *password) {
         return false;
       }
     } else {
+      if(privilege > tmp.privilege) {
+        privilege = tmp.privilege;
+        return  true;
+      }
       if(tmp.password[0] !='\0') {
         return false;
       }
