@@ -1,14 +1,18 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include<cctype>
 #include<fstream>
 #include<exception>
 #include "user.cpp"
 #include"book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
-#include"utils.hpp"
 //保存系统状态
+
+
+
+
 
 struct aBook {
   char ISBN[20];
@@ -64,6 +68,48 @@ void Run(user &user_, book &book_, Profit &_log_profit,
          SystemLog &_log_sys, Operator &_log_operator);
 
 void splitOrder(std::string &input, std::vector<std::string> &orders);
+
+bool check_no_blank(const char * s);
+
+bool check_only_(const char * s);
+
+bool check_no_blank_quation(const char * s);
+
+bool check_no_blank(const char * s) {
+  int l = strlen(s);
+  for(int i = 0;i<l;i++) {
+    if(!isgraph(s[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+//检查是否有数字，字母，下划线之外的字符
+bool check_only_(const char * s) {
+  int l = strlen(s);
+  for(int i = 0;i<l;i++) {
+    if(isupper(s[i])||islower(s[i])||isdigit(s[i])||s[i] =='_') {
+      continue;
+    }
+    else {
+      return false;
+    }
+  }
+  return true;
+}
+//检查是否有空格或者引号
+
+bool check_no_blank_quation(const char * s) {
+  int l = strlen(s);
+  for(int i = 0;i<l;i++) {
+    if(!isgraph(s[i])||s[i] == '\"') {
+      return false;
+    }
+  }
+  return true;
+}
+
 
 
 int getInt(const std::string &number) {
