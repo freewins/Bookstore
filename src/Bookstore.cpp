@@ -261,8 +261,7 @@ void splitOrder(std::string &input, std::vector<std::string> &orders) {
 }
 
 
-void Run(user &user_, book &book_, Profit &_log_profit,
-         SystemLog &_log_sys, Operator &_log_operator) {
+void Run(user &user_, book &book_, Profit &_log_profit) {
   std::string input;
   std::vector<std::string> orders;
   std::vector<Statement> state;
@@ -594,16 +593,22 @@ void Run(user &user_, book &book_, Profit &_log_profit,
 
 
  int main() {
-
+    // std::fstream file ;
+    // for(int i = 0;i<8;i++) {
+    //   file.open(Path[i],std::ios::out|std::ios::trunc);
+    //   file.close();
+    // }
+  // freopen("../testcases/basic/testcase8/51.in","r",stdin);
+  // freopen("../testcases/basic/testcase8/51.out","w",stdout);
   // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);
   Profit _log_profit(Path[7]);
-  SystemLog _log_sys(Path[5]);
-  Operator _log_operator(Path[6]);
+  // SystemLog _log_sys(Path[5]);
+  // Operator _log_operator(Path[6]);
 
   try {
-    Run(_user, _book, _log_profit, _log_sys, _log_operator);
+    Run(_user, _book, _log_profit);
   } catch (...) {
   }
   return 0;
