@@ -8,7 +8,7 @@
 #include <string.h>
 #include<vector>
 #include "file.cpp"
-
+#include"utils.hpp"
 
 class book {
   //Info 1: 书籍总数

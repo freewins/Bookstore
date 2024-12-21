@@ -3,7 +3,8 @@ set(CMAKE_CXX_STANDARD 20)
 project(code)
 
 add_executable(code
-        src/Bookstore.cpp)
+        src/Bookstore.cpp
+        include/utils.hpp)
 
 target_include_directories(
         code

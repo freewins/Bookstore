@@ -7,6 +7,7 @@
 #include"book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
+#include"utils.hpp"
 //保存系统状态
 
 struct aBook {
@@ -135,7 +136,10 @@ INFO getInfoType(const std::string &op, std::string &data) {
 
       if (get_op == "ISBN") {
         data = op.substr(p + 1);
-        return INFO::ISBN;
+        if(check_no_blank(data.c_str())) {
+          return INFO::ISBN;
+        }
+        return INFO::dFualt;
       } else if (get_op == "name") {
         //去掉冒号
         if (p + 1 < l && op[p + 1] == '\"') {
@@ -144,7 +148,10 @@ INFO getInfoType(const std::string &op, std::string &data) {
             int i = p+2;
             int j = next_pos - p - 2;
             data = op.substr(p + 2, next_pos - p - 2 );
-            return INFO::NAME;
+            if(check_no_blank_quation(data.c_str())) {
+              return INFO::NAME;
+            }
+            return INFO::dFualt;
           }
         }
         return INFO::dFualt;
@@ -153,6 +160,9 @@ INFO getInfoType(const std::string &op, std::string &data) {
           int next_pos = op.find('\"',p + 2 );
           if (next_pos == l - 1) {
             data = op.substr(p + 2, next_pos - p - 2 );
+            if(check_no_blank_quation(data.c_str())) {
+              return INFO::AUTHOR;
+            }
             return INFO::AUTHOR;
           }
         }
@@ -162,7 +172,10 @@ INFO getInfoType(const std::string &op, std::string &data) {
           int next_pos = op.find('\"',p + 2);
           if (next_pos == l - 1) {
             data = op.substr(p + 2, next_pos - p - 2 );
-            return INFO::KETWORD;
+            if(check_no_blank_quation(data.c_str())) {
+              return INFO::KETWORD;
+            }
+            return INFO::dFualt;
           }
         }
         return INFO::dFualt;
@@ -201,6 +214,7 @@ void splitOrder(std::string &input, std::vector<std::string> &orders) {
   }
 }
 
+
 void Run(user &user_, book &book_, Profit &_log_profit,
          SystemLog &_log_sys, Operator &_log_operator) {
   std::string input;
@@ -228,7 +242,7 @@ void Run(user &user_, book &book_, Profit &_log_profit,
           int privilege_;
           bool success_login = false;
           if (l == 2) {
-            success_login = user_.login(orders[1].c_str(), privilege_);
+              success_login = user_.login(orders[1].c_str(), privilege_);
           } else if (l == 3) {
             success_login = user_.login(orders[1].c_str(), privilege_, orders[2].c_str());
           } else {
@@ -266,9 +280,14 @@ void Run(user &user_, book &book_, Profit &_log_profit,
           if (l != 4) {
             throw defualtError("Invalid\n");
           } else {
-            if (!user_.addUser(orders[1].c_str(), orders[3].c_str(), 1, orders[2].c_str())) {
+            if(check_only_(orders[1].c_str())&&check_only_(orders[2].c_str())&&check_no_blank(orders[3].c_str())) {
+              if (!user_.addUser(orders[1].c_str(), orders[3].c_str(), 1, orders[2].c_str())) {
+                throw defualtError("Invalid\n");
+              }
+            }else {
               throw defualtError("Invalid\n");
             }
+
           }
         }
         else if (orders[0] == "passwd") {
@@ -277,16 +296,26 @@ void Run(user &user_, book &book_, Profit &_log_profit,
           } else {
             if (l == 3) {//有没有修改密码为空的情况
               if(now_privilege  == 7) {
-                if (!user_.modifyPasswd(orders[1].c_str(), orders[2].c_str())) {
+                if(check_only_(orders[2].c_str())) {
+                  if (!user_.modifyPasswd(orders[1].c_str(), orders[2].c_str())) {
+                    throw defualtError("Invalid\n");
+                  }
+                }else {
                   throw defualtError("Invalid\n");
                 }
+
               }
               else {
                 throw defualtError("Invalid\n");
               }
             }
             else if(l == 4){
-              if (!user_.modifyPasswd(orders[1].c_str(), orders[3].c_str(), orders[2].c_str())) {
+              if(check_only_(orders[3].c_str())) {
+                if (!user_.modifyPasswd(orders[1].c_str(), orders[3].c_str(), orders[2].c_str())) {
+                  throw defualtError("Invalid\n");
+                }
+              }
+              else {
                 throw defualtError("Invalid\n");
               }
             }
@@ -296,16 +325,25 @@ void Run(user &user_, book &book_, Profit &_log_profit,
           }
         }
         else if (orders[0] == "useradd") {
-          if (l != 5 || now_privilege < 3) {
+          if (l != 5 ) {
             throw defualtError("Invalid\n");
           } else {
             int tmp = getInt(orders[3]);
             if (tmp == -1) {
               throw defualtError("Invalid\n");
             }
-            if (!user_.addUser(orders[1].c_str(), orders[4].c_str(), tmp, orders[2].c_str())) {
+            if(tmp >= now_privilege) {
               throw defualtError("Invalid\n");
             }
+            if(check_only_(orders[1].c_str())&&check_no_blank(orders[4].c_str())&&check_only_(orders[2].c_str())) {
+              if (!user_.addUser(orders[1].c_str(), orders[4].c_str(), tmp, orders[2].c_str())) {
+                throw defualtError("Invalid\n");
+              }
+            }
+            else {
+              throw defualtError("Invalid\n");
+            }
+
           }
         }
         else if (orders[0] == "delete") {
@@ -515,8 +553,8 @@ void Run(user &user_, book &book_, Profit &_log_profit,
       file.open(Path[i],std::ios::out|std::ios::trunc);
       file.close();
     }
-  freopen("../testcases/basic/testcase3.in","r",stdin);
-  freopen("../testcases/basic/3.out","w",stdout);
+  freopen("../testcases/basic/testcase5.in","r",stdin);
+  freopen("../testcases/basic/testcase5-2.out","w",stdout);
   // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);
