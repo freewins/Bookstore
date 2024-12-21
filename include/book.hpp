@@ -8,7 +8,6 @@
 #include <string.h>
 #include<vector>
 #include "file.cpp"
-#include"utils.hpp"
 
 class book {
   //Info 1: 书籍总数
@@ -126,6 +125,5 @@ public:
 
   bool import(Book &, int quantity, double total_cost, int &pos);
 };
-
 
 #endif //BOOK_HPP

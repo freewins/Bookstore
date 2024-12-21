@@ -5,7 +5,6 @@
 #ifndef USER_HPP
 #define USER_HPP
 #include "file.cpp"
-#include"utils.hpp"
 class user {
 private:
   //Info 1: 写入总数
