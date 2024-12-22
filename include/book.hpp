@@ -46,6 +46,7 @@ public:
       char tmp[61];
       for (int i = 0, j = 0; i < strlen(keyWord); i++) {
         int k = 0;
+        j = i;
         while (keyWord[j] != '|' && keyWord[j] != '\0') {
           tmp[k++] = keyWord[j++];
         }
@@ -53,7 +54,7 @@ public:
         if (strcmp(tmp, des) == 0) {
           return true;
         }
-        i = j;
+        i = j ;
       }
       return false;
     }
