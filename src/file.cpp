@@ -323,6 +323,7 @@ T Index<T, len, info>::findData(const char *key, bool &check, int &pos) {
         }
       }
     }
+    if(check)break;
     cur = cur->next;
   }
   delete[] pools;
@@ -366,6 +367,7 @@ template<typename T, int len, int info>
 bool Index<T, len, info>::updateData(T &value, int pos) {
   block_file.seekp(pos, std::ios::beg);
   Data tmp;
+  //可优化
   block_file.read(reinterpret_cast<char *>(&tmp),sizeof(Data));
   tmp.value = value;
   block_file.seekp(pos, std::ios::beg);
@@ -394,13 +396,17 @@ bool Index<T, len, info>::deleteData(const char *key, T &value) {
         exist = true;
       }
       //删除的尾部
-      //说明存在要删除的对象 不会出现相同的value
       if (exist) {
         int startSize = t - pool;
         if (cur->now_size == 2) {
           cur->now_size = 1;
-          if (!startSize) {
-            strcpy(cur->max, pool[0].key);
+          if (startSize) {//要删除最大值
+            strcpy(cur->max,pool[0].key);
+          }
+          else {
+            //删除最小值
+            block_file.seekp(cur->cur, std::ios::beg);
+            block_file.write(reinterpret_cast<char*>(&pool[1]),sizeof(Data));
           }
           cur->min[0] = '\0';
         } else if (cur->now_size == 1) {
@@ -408,9 +414,9 @@ bool Index<T, len, info>::deleteData(const char *key, T &value) {
           cur->now_size = 0;
         } else {
           if (startSize == 0) {
-            strcpy(cur->min, pool[1].key);
+            strcpy(cur->min,pool[1].key);
           } else if (startSize == cur->now_size - 1) {
-            strcpy(cur->max, pool[cur->now_size - 2].key);
+            strcpy(cur->max,pool[cur->now_size - 2].key);
           }
           block_file.seekp(cur->cur, std::ios::beg);
           block_file.write(reinterpret_cast<char *>(pool), sizeof(Data) * startSize);
@@ -418,7 +424,6 @@ bool Index<T, len, info>::deleteData(const char *key, T &value) {
                            sizeof(Data) * (cur->now_size - startSize - 1));
           cur->now_size--;
           //Merge需要传入当前和上一个指针
-          //TODO 会不会出现相同的key 和value 的情况
           Merge(cur, forcur);
         }
         break;

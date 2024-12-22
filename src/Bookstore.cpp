@@ -8,6 +8,7 @@
 #include"book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
+
 //保存系统状态
 
 
@@ -273,10 +274,19 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
   int now_privilege = 0;
   int now_bookPos = -1;
   int l; //指令参数计数器
+#ifdef DEBUG
+  int count  = 0;
+#endif
+
   while (true) {
+#ifdef DEBUG
+    count ++;
+#endif
+
     try {
       std::getline(std::cin, input);
       if (input == "") {
+        //return;
         continue;
       } else {
         splitOrder(input, orders);
@@ -598,8 +608,8 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
     //   file.open(Path[i],std::ios::out|std::ios::trunc);
     //   file.close();
     // }
-  // freopen("../testcases/basic/testcase8/51.in","r",stdin);
-  // freopen("../testcases/basic/testcase8/51.out","w",stdout);
+  // freopen("../testcases/advanced/testcase5/10.in","r",stdin);
+  // freopen("../testcases/advanced/testcase5/10.dns","w",stdout);
   // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);
