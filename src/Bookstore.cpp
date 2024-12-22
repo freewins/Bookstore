@@ -286,7 +286,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
     try {
       std::getline(std::cin, input);
       if (input == "") {
-        //return;
+        return;
         continue;
       } else {
         splitOrder(input, orders);
