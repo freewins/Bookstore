@@ -13,9 +13,6 @@
   int count  = 0 ;
 #endif
 //保存系统状态
-
-
-
 struct Statement {
   int nowPrivilige;
   int book_Pos;
@@ -606,8 +603,11 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
 
 
 int main() {
-
-  // //存储文件保存路径
+  std::fstream file ;
+  for(int i = 0;i<8;i++) {
+    file.open(Path[i],std::ios::out|std::ios::trunc);
+    file.close();
+  }
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);
   Profit _log_profit(Path[7]);
@@ -617,6 +617,5 @@ int main() {
     Run(_user, _book, _log_profit);
   }
   catch (...){}
-
   return 0;
 }
