@@ -9,7 +9,6 @@
 #include"book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
-#define DEBUG
 #ifdef DEBUG
   int count  = 0 ;
 #endif
@@ -32,14 +31,14 @@ enum INFO { ISBN, NAME, AUTHOR, KETWORD, PRICE, dFualt };
 
 const std::string Path[10] =
 {
-  "../Data/Index/userInfoIndex.index",
-  "../Data/Index/bookInfoIndex.index",
-  "../Data/basicInfo.data",
-  "../Data/bookInfo.data",
-  "../Data/userInfo.data",
-  "../Data/syslogInfo.data",
-  "../Data/operatorInfo.data",
-  "../Data/profitInfo.data"
+  "./Data/Index/userInfoIndex.index",
+  "./Data/Index/bookInfoIndex.index",
+  "./Data/basicInfo.data",
+  "./Data/bookInfo.data",
+  "./Data/userInfo.data",
+  "./Data/syslogInfo.data",
+  "./Data/operatorInfo.data",
+  "./Data/profitInfo.data"
 };
 
 class defualtError : public std::exception {
@@ -607,14 +606,14 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
 
 
 int main() {
-  std::fstream file ;
-  for(int i = 0;i<8;i++) {
-    file.open(Path[i],std::ios::out|std::ios::trunc);
-    file.close();
-  }
-  // freopen("../testcases/basic/testcase3.in","r",stdin);
-  // freopen("../testcases/basic/testcase3.dns","w",stdout);
-  //auto start = std::chrono::high_resolution_clock::now();
+  // std::fstream file ;
+  // for(int i = 0;i<8;i++) {
+  //   file.open(Path[i],std::ios::out|std::ios::trunc);
+  //   file.close();
+  // }
+  //  freopen("../testcases/basic/testcase/1.in","r",stdin);
+  //  freopen("../testcases/basic/testcase7/1.dns","w",stdout);
+  // //auto start = std::chrono::high_resolution_clock::now();
   // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);
