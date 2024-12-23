@@ -9,10 +9,7 @@
 #include"book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
-#ifdef DEBUG
-  int count  = 0 ;
-#endif
-//保存系统状态
+
 
 
 
@@ -270,16 +267,10 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
   int l; //指令参数计数器
 
 
-  while (true) {
-#ifdef DEBUG
-    count ++;
-#endif
-
+  while (std::getline(std::cin, input)) {
     try {
-      std::getline(std::cin, input);
       if (input == "") {
         return;
-        continue;
       } else {
         splitOrder(input, orders);
         l = orders.size();
@@ -595,9 +586,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
         }
       }
     } catch (const defualtError &e) {
-#ifdef DEBUG
-      std::cout<<count<<":";
-#endif
+
 
       std::cout <<e.what();
     }
@@ -620,14 +609,9 @@ int main() {
   Profit _log_profit(Path[7]);
   // SystemLog _log_sys(Path[5]);
   // Operator _log_operator(Path[6]);
-  try {
-    Run(_user, _book, _log_profit);
-  }
-  catch (...){}
 
-  // auto end = std::chrono::high_resolution_clock::now();
-  // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-  // freopen("/dev/tty","w",stdout);
-  //std::cout<<duration;
+  Run(_user, _book, _log_profit);
+
+
   return 0;
 }
