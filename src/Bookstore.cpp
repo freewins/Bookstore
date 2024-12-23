@@ -9,7 +9,8 @@
 #include"book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
-#define DEBUG
+
+
 #ifdef DEBUG
   int count  = 0 ;
 #endif
@@ -32,14 +33,14 @@ enum INFO { ISBN, NAME, AUTHOR, KETWORD, PRICE, dFualt };
 
 const std::string Path[10] =
 {
-  "../Data/Index/userInfoIndex.index",
-  "../Data/Index/bookInfoIndex.index",
-  "../Data/basicInfo.data",
-  "../Data/bookInfo.data",
-  "../Data/userInfo.data",
-  "../Data/syslogInfo.data",
-  "../Data/operatorInfo.data",
-  "../Data/profitInfo.data"
+  "userInfoIndex.index",
+  "bookInfoIndex.index",
+  "basicInfo.data",
+  "bookInfo.data",
+  "userInfo.data",
+  "syslogInfo.data",
+  "operatorInfo.data",
+  "profitInfo.data"
 };
 
 class defualtError : public std::exception {
@@ -424,6 +425,10 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               throw defualtError("Invalid\n");
             } else {
               _log_profit.save(total);
+#ifdef DEBUG
+              std::cout<<count<<":";
+#endif
+
               printf("%.2lf\n", total);
             }
           }
@@ -542,7 +547,13 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               if (tmp == -1) {
                 throw defualtError("Invalid\n");
               } else {
-                _log_profit.read(tmp);
+#ifdef DEBUG
+  std::cout<<count<<":";
+#endif
+
+                if(!_log_profit.read(tmp)) {
+                  throw defualtError("Invalid\n");
+                }
               }
             } else {
               throw defualtError("Invalid\n");
@@ -552,7 +563,12 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             //按条件打印对应图书
             //还有可能是finance
             if (orders[1] == "finance") {
-              _log_profit.read();
+              if(now_privilege < 7) {
+                throw defualtError("Invalid\n");
+              }
+              if(!_log_profit.read()) {
+                throw defualtError("Invalid\n");
+              }
             } else {
               //按条件打印对应图书
               std::string data;
@@ -607,14 +623,14 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
 
 
 int main() {
-  std::fstream file ;
-  for(int i = 0;i<8;i++) {
-    file.open(Path[i],std::ios::out|std::ios::trunc);
-    file.close();
-  }
-  // freopen("../testcases/basic/testcase3.in","r",stdin);
-  // freopen("../testcases/basic/testcase3.dns","w",stdout);
-  //auto start = std::chrono::high_resolution_clock::now();
+  // std::fstream file ;
+  // for(int i = 0;i<8;i++) {
+  //   file.open(Path[i],std::ios::out|std::ios::trunc);
+  //   file.close();
+  // }
+  // freopen("../testcases/complex/testcase4/2.in","r",stdin);
+  // freopen("../testcases/complex/testcase4/2.dns","w",stdout);
+  // auto start = std::chrono::high_resolution_clock::now();
   // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);

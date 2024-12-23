@@ -296,13 +296,12 @@ T Index<T, len, info>::findData(const char *key, bool &check, int &pos) {
   Block *cur = head;
   Data *pools = new Data[sqrBlocksize * 3];
   T temp;
-  check = true;
+  check = false ;
   //存储数据 把所有相同的data数据存入其中
   while (cur != nullptr) {
     //循环中执行 可能有好几个块中存放了相同的数据
     //采用全部读入，二分比较的方法
     if ( strcmp(key, cur->max) <= 0 ) {
-      check = false;
       block_file.seekg(cur->cur, std::ios::beg);
       //key值在当前块的范围
       block_file.read(reinterpret_cast<char *>(pools), sizeof(Data) * cur->now_size);
@@ -314,8 +313,8 @@ T Index<T, len, info>::findData(const char *key, bool &check, int &pos) {
           break;
         }
       }
+      break;
     }
-    if(!check)break;
     cur = cur->next;
   }
   delete[] pools;
@@ -441,6 +440,7 @@ LogFile<T, info_len>::LogFile(const std::string &file_name) : file_name(file_nam
     isFirst = true;
   }
   else {
+    file.seekg(0,std::ios::end);
     if(file.tellg() == 0) {
       isFirst = true;
     }

@@ -11,7 +11,7 @@
 //mode = 1  ISBN | mode 2 Name | mode 3 author | mode 4 keyword |
 
 template<>
-void Index<book::Book, 20>::showAll(const char *find_key, int mode) {
+void Index<book::Book, 22>::showAll(const char *find_key, int mode) {
   std::vector<Data> Datas;
   Data *pools = new Data[sqrBlocksize * 3];
   auto cur = head;
