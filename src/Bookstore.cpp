@@ -11,16 +11,14 @@
 #include "logs.cpp"
 
 
-
-
 struct Statement {
   int nowPrivilige;
   int book_Pos;
   std::string ISBN;
   std::string userId;
-  Statement(int now_pri,int book_Pos_,std::string ISBN_,std::string userId_):
-  nowPrivilige(now_pri),book_Pos(book_Pos_),ISBN(ISBN_),userId(userId_){
 
+  Statement(int now_pri, int book_Pos_, std::string ISBN_, std::string userId_): nowPrivilige(now_pri),
+    book_Pos(book_Pos_), ISBN(ISBN_), userId(userId_) {
   }
 };
 
@@ -286,7 +284,8 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             throw defualtError("Invalid\n");
           }
           if (success_login) {
-            if(!state.empty()) { // 非空 需要更新用户状态
+            if (!state.empty()) {
+              // 非空 需要更新用户状态
               state.back().book_Pos = now_bookPos;
               state.back().ISBN = ISBN;
             }
@@ -296,16 +295,13 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             now_privilege = privilege_;
             //有账户压栈
             state.push_back({now_privilege, now_bookPos, ISBN, userId});
-          }
-          else {
+          } else {
             throw defualtError("Invalid\n");
           }
-        }
-        else if (orders[0] == "logout") {
+        } else if (orders[0] == "logout") {
           if (l > 1 | now_privilege == 0) {
             throw defualtError("Invalid\n");
-          }
-          else {
+          } else {
             state.pop_back();
             if (state.empty()) {
               now_privilege = 0;
@@ -317,11 +313,10 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               now_privilege = state.back().nowPrivilige;
               now_bookPos = state.back().book_Pos;
               ISBN = state.back().ISBN;
-              book_.select(nowBook,ISBN.c_str(),now_bookPos);
+              book_.select(nowBook, ISBN.c_str(), now_bookPos);
             }
           }
-        }
-        else if (orders[0] == "register") {
+        } else if (orders[0] == "register") {
           if (l != 4) {
             throw defualtError("Invalid\n");
           } else {
@@ -333,8 +328,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               throw defualtError("Invalid\n");
             }
           }
-        }
-        else if (orders[0] == "passwd") {
+        } else if (orders[0] == "passwd") {
           if (l > 4 || now_privilege == 0) {
             throw defualtError("Invalid\n");
           } else {
@@ -363,8 +357,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               throw defualtError("Invalid\n");
             }
           }
-        }
-        else if (orders[0] == "useradd") {
+        } else if (orders[0] == "useradd") {
           if (l != 5) {
             throw defualtError("Invalid\n");
           } else {
@@ -383,8 +376,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               throw defualtError("Invalid\n");
             }
           }
-        }
-        else if (orders[0] == "delete") {
+        } else if (orders[0] == "delete") {
           if (l != 2 || orders[1] == userId || now_privilege < 7) {
             throw defualtError("Invalid\n");
           } else {
@@ -417,17 +409,14 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               printf("%.2lf\n", total);
             }
           }
-        }
-        else if (orders[0] == "select") {
+        } else if (orders[0] == "select") {
           if (l != 2 || now_privilege < 3) {
             throw defualtError("Invalid\n");
           } else {
             book_.select(nowBook, orders[1].c_str(), now_bookPos);
             ISBN = orders[1];
-
           }
-        }
-        else if (orders[0] == "modify") {
+        } else if (orders[0] == "modify") {
           if (now_privilege < 2 || now_bookPos == -1) {
             throw defualtError("Invalid\n");
           } else {
@@ -461,15 +450,14 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
                 }
                 case INFO::ISBN: {
                   if (book_.modify(nowBook, ISBN.c_str(), datas[i - 1].c_str(), now_bookPos, 1)) {
-                    for(auto t = state.begin();t !=  state.end();++t) {
-                      if(t->ISBN == ISBN) {
-                        t->ISBN = datas[i-1];
+                    for (auto t = state.begin(); t != state.end(); ++t) {
+                      if (t->ISBN == ISBN) {
+                        t->ISBN = datas[i - 1];
                       }
                     }
                     // TODO 有没有必要在外部放这么多东西， iSBN，nowPos 这些都在栈顶
-                     ISBN = datas[i-1];
-                  }
-                  else {
+                    ISBN = datas[i - 1];
+                  } else {
                     throw defualtError("Invalid\n");
                   }
                   break;
@@ -501,8 +489,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               }
             }
           }
-        }
-        else if (orders[0] == "import") {
+        } else if (orders[0] == "import") {
           if (l != 3 || now_privilege < 3 || now_bookPos == -1) {
             throw defualtError("Invalid\n");
           } else {
@@ -579,31 +566,26 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
         //exit
         else if (orders[0] == "quit" || orders[0] == "exit") {
           return;
-        }
-        else
-        {
+        } else {
           throw defualtError("Invalid\n");
         }
       }
     } catch (const defualtError &e) {
-
-
-      std::cout <<e.what();
+      std::cout << e.what();
     }
   }
 }
 
 
 int main() {
-  // std::fstream file ;
-  // for(int i = 0;i<8;i++) {
-  //   file.open(Path[i],std::ios::out|std::ios::trunc);
+  // std::fstream file;
+  // for (int i = 0; i < 8; i++) {
+  //   file.open(Path[i], std::ios::out | std::ios::trunc);
   //   file.close();
   // }
-  // // }
-  // freopen("../testcases/basic/testcase2.in","r",stdin);
-  //  freopen("../testcases/basic/testcase2.dns","w",stdout);
-  // // //auto start = std::chrono::high_resolution_clock::now();
+  //
+  // freopen("../testcases/basic/testcase1.in","r",stdin);
+  // freopen("../testcases/basic/testcase1.dns","w",stdout);
   // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);

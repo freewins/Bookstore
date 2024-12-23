@@ -72,25 +72,18 @@ template<typename T, int len, int info>
 void Index<T, len, info>::Initialise() {
   Block *temp = new Block(0);
   temp->cur = -1;
-  index_file.open(Indexnmame, std::ios::in | std::ios::binary);
+  index_file.open(Indexnmame, std::ios::in | std::ios::binary|std::ios::out);
   index_file.seekp(0, std::ios::end);
   bool noBlock = false;
   if (index_file.tellg() == 0) {
     //文件刚刚创建 需要写info
     noBlock = true;
-    int tmp = 0;
-    for (int i = 0; i < info; i++) {
-      index_file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
-      info_data[i] = tmp;
-    }
+
   } else {
     //开头部分放 Blockcount
     index_file.seekg(0, std::ios::beg);
     index_file.read(reinterpret_cast<char *>(&Blockcount), sizeof(int));
-    for (int i = 1; i < info; i++) {
-      index_file.read(reinterpret_cast<char *>(&info_data[i]), sizeof(int));
-    }
-    if (Blockcount == 0) {
+    if (Blockcount <= 0) {
       noBlock = true;
     }
   }
@@ -102,6 +95,12 @@ void Index<T, len, info>::Initialise() {
     head->next = nullptr;
     head->now_size = 0;
     head->max[0] = '\0';
+    int tmp = 0;
+    for (int i = 0; i < info; i++) {
+      index_file.seekp(0,std::ios::beg);
+      index_file.write(reinterpret_cast<char *>(&tmp), sizeof(int));
+      info_data[i] = tmp;
+    }
   } else {
     index_file.seekg(offset, std::ios::beg);
     index_file.read(reinterpret_cast<char *>(temp), sizeof(Block));
