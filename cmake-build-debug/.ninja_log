@@ -1,7 +1,0 @@
-# ninja log v6
-195	878	7560406668335614	CMakeFiles/Bookstore.dir/src/book.cpp.obj	9b963788eef35141
-348	950	7560406669855598	CMakeFiles/Bookstore.dir/src/logs.cpp.obj	7e332f69596ed1b1
-104	1762	7560406667419728	CMakeFiles/Bookstore.dir/src/Bookstore.cpp.obj	163fae01afa5b999
-465	1895	7560406671031349	CMakeFiles/Bookstore.dir/src/user.cpp.obj	53e6c32427895944
-7	1244	7560407496740851	CMakeFiles/Bookstore.dir/src/file.cpp.obj	ca475970fe6d56a5
-1258	1762	7560407509253871	Bookstore.exe	9955a8788b3b00ef

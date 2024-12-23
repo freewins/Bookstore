@@ -44,7 +44,6 @@ private:
   int offset;
   int Blockcount;
   int sqrBlocksize;
-
   int info_data[info];
   //索引文件
   std::fstream index_file;
