@@ -6,7 +6,7 @@
 #include<exception>
 #include<chrono>
 #include "user.cpp"
-#include"book.cpp"
+#include "book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
 
@@ -28,14 +28,14 @@ enum INFO { ISBN, NAME, AUTHOR, KETWORD, PRICE, dFualt };
 
 const std::string Path[10] =
 {
-  "./Data/Index/userInfoIndex.index",
-  "./Data/Index/bookInfoIndex.index",
-  "./Data/basicInfo.data",
-  "./Data/bookInfo.data",
-  "./Data/userInfo.data",
-  "./Data/syslogInfo.data",
-  "./Data/operatorInfo.data",
-  "./Data/profitInfo.data"
+  "../Data/Index/userInfoIndex.index",
+  "../Data/Index/bookInfoIndex.index",
+  "../Data/basicInfo.data",
+  "../Data/bookInfo.data",
+  "../Data/userInfo.data",
+  "../Data/syslogInfo.data",
+  "../Data/operatorInfo.data",
+  "../Data/profitInfo.data"
 };
 
 class defualtError : public std::exception {
@@ -600,18 +600,16 @@ int main() {
   //   file.open(Path[i],std::ios::out|std::ios::trunc);
   //   file.close();
   // }
-  //  freopen("../testcases/basic/testcase/1.in","r",stdin);
-  //  freopen("../testcases/basic/testcase7/1.dns","w",stdout);
-  // //auto start = std::chrono::high_resolution_clock::now();
+  // // }
+  // freopen("../testcases/basic/testcase2.in","r",stdin);
+  //  freopen("../testcases/basic/testcase2.dns","w",stdout);
+  // // //auto start = std::chrono::high_resolution_clock::now();
   // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);
   Profit _log_profit(Path[7]);
   // SystemLog _log_sys(Path[5]);
   // Operator _log_operator(Path[6]);
-
   Run(_user, _book, _log_profit);
-
-
   return 0;
 }

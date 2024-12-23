@@ -15,6 +15,7 @@ template<typename T, int len, int info>
 Index<T, len, info>::Index(int blocksize, const std::string &indexname, const std::string &blockname): Blocksize(blocksize),
     Indexnmame(indexname), Blockname(blockname) {
   sqrBlocksize = sqrt(Blocksize);
+  Blockcount = 0;
   index_file.open(indexname, std::ios::out | std::ios::binary | std::ios::in);
   if (!index_file.is_open()) {
     index_file.open(indexname, std::ios::out);
@@ -35,7 +36,6 @@ Index<T, len, info>::Index(int blocksize, const std::string &indexname, const st
 template<typename T, int len, int info>
 Index<T, len, info>::~Index() {
   //析构 首先是要把所有链表存储到Index里面 然后进行析构
-  block_file.clear();
   block_file.close();
   Block *cur = head;
   Block *delete_p;
@@ -54,7 +54,6 @@ Index<T, len, info>::~Index() {
     cur = cur->next;
     delete delete_p;
   }
-  index_file.clear();
   index_file.close();
 }
 
