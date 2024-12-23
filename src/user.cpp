@@ -11,7 +11,6 @@ bool user::login(const char *userId, int &privilege, const char *password) {
   bool is_find = false;
   User tmp = userIndex.findData(userId, is_find);
   if (is_find) {
-
     if (password != nullptr) {
       if (strcmp(password, tmp.password) == 0) {
         //TODO 需不需要密码的特判
@@ -41,7 +40,7 @@ bool user::logout() {
 bool user::daleteUser(const char *userId) {
   bool is_find = false;
   User tmp;
-  if( userIndex.deleteData(userId, tmp)) {
+  if( userIndex.deleteData(userId)) {
     total_user--;
     return true;
   }

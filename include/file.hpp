@@ -16,7 +16,6 @@ class Index {
     long long cur;
     int now_size;
     char max[len];
-    char min[len];
     Block *next;
   };
 
@@ -27,12 +26,6 @@ class Index {
     friend bool operator<(const Data &a, const Data &b) {
       return strcmp(a.key, b.key) < 0;
     }
-
-    // friend bool operator<= (const Data & a,const Data & b) {
-    //
-    //   return strcmp(a.key, b.key) < 0;
-    //
-    // }
     friend bool operator==(const Data &a, const Data &b) {
       return strcmp(a.key, b.key) == 0;
     }
@@ -85,7 +78,7 @@ public:
   bool insertData(const char *, T &value);
 
   //在当前块中删除块
-  bool deleteData(const char *, T &value);
+  bool deleteData(const char *);
 
   bool updateData(T &value, int pos);
 

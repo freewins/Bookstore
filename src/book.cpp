@@ -108,7 +108,7 @@ bool book::buy(const char *ISBN, int &quantity, double &total) {
   }
 }
 
-bool book::selete(Book &tmp, const char *ISBN, int &pos) {
+bool book::select(Book &tmp, const char *ISBN, int &pos) {
   bool find;
   tmp = bookIndex.findData(ISBN, find, pos);
   if (!find) {
@@ -134,7 +134,7 @@ bool book::modify(Book &tmp, const char *ISBN, const char *new_data, int &pos, i
         //有重复的ISBN
         return false;
       }
-      bookIndex.deleteData(ISBN, tmp);
+      bookIndex.deleteData(ISBN);
       bookIndex.insertData(new_data, tmp);
       //TODO 能不能写一个insert函数直接返回对应 pos 的
       bookIndex.findData(new_data, is, pos);

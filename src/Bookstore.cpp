@@ -4,46 +4,41 @@
 #include<cctype>
 #include<fstream>
 #include<exception>
+#include<chrono>
 #include "user.cpp"
 #include"book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
-
+#ifdef DEBUG
+  int count  = 0 ;
+#endif
 //保存系统状态
 
 
 
-
-
-struct aBook {
-  char ISBN[20];
-  book::Book _book;
-
-  aBook &operator=(const aBook &a) {
-    strcpy(ISBN, a.ISBN);
-    this->_book = a._book;
-    return *this;
-  }
-};
-
 struct Statement {
   int nowPrivilige;
   int book_Pos;
-  aBook _abook;
+  std::string ISBN;
   std::string userId;
+  Statement(int now_pri,int book_Pos_,std::string ISBN_,std::string userId_):
+  nowPrivilige(now_pri),book_Pos(book_Pos_),ISBN(ISBN_),userId(userId_){
+
+  }
 };
 
 enum INFO { ISBN, NAME, AUTHOR, KETWORD, PRICE, dFualt };
 
-const std::string Path[10] = {
-  "../Data/Index/userInfoIndex.index",
-  "../Data/Index/bookInfoIndex.index",
-  "../Data/basicInfo.data",
-  "../Data/bookInfo.data",
-  "../Data/userInfo.data",
-  "../Data/syslogInfo.data",
-  "../Data/operatorInfo.data",
-  "../Data/profitInfo.data"
+const std::string Path[10] =
+{
+  "./Data/Index/userInfoIndex.index",
+  "./Data/Index/bookInfoIndex.index",
+  "./Data/basicInfo.data",
+  "./Data/bookInfo.data",
+  "./Data/userInfo.data",
+  "./Data/syslogInfo.data",
+  "./Data/operatorInfo.data",
+  "./Data/profitInfo.data"
 };
 
 class defualtError : public std::exception {
@@ -70,16 +65,16 @@ void Run(user &user_, book &book_, Profit &_log_profit,
 
 void splitOrder(std::string &input, std::vector<std::string> &orders);
 
-bool check_no_blank(const char * s);
+bool check_no_blank(const char *s);
 
-bool check_only_(const char * s);
+bool check_only_(const char *s);
 
-bool check_no_blank_quation(const char * s);
+bool check_no_blank_quation(const char *s);
 
-bool check_no_blank(const char * s) {
+bool check_no_blank(const char *s) {
   int l = strlen(s);
-  for(int i = 0;i<l;i++) {
-    if(!isgraph(s[i])) {
+  for (int i = 0; i < l; i++) {
+    if (!isgraph(s[i])) {
       return false;
     }
   }
@@ -87,30 +82,29 @@ bool check_no_blank(const char * s) {
 }
 
 //检查是否有数字，字母，下划线之外的字符
-bool check_only_(const char * s) {
+bool check_only_(const char *s) {
   int l = strlen(s);
-  for(int i = 0;i<l;i++) {
-    if(isupper(s[i])||islower(s[i])||isdigit(s[i])||s[i] =='_') {
+  for (int i = 0; i < l; i++) {
+    if (isupper(s[i]) || islower(s[i]) || isdigit(s[i]) || s[i] == '_') {
       continue;
-    }
-    else {
+    } else {
       return false;
     }
   }
   return true;
 }
+
 //检查是否有空格或者引号
 
-bool check_no_blank_quation(const char * s) {
+bool check_no_blank_quation(const char *s) {
   int l = strlen(s);
-  for(int i = 0;i<l;i++) {
-    if(!isgraph(s[i])||s[i] == '\"') {
+  for (int i = 0; i < l; i++) {
+    if (!isgraph(s[i]) || s[i] == '\"') {
       return false;
     }
   }
   return true;
 }
-
 
 
 int getInt(const std::string &number) {
@@ -163,8 +157,7 @@ double getDouble(const std::string &number) {
       }
     }
     return flag * ans;
-  }
-  else {
+  } else {
     double ans = getInt(number);
     return ans;
   }
@@ -183,19 +176,19 @@ INFO getInfoType(const std::string &op, std::string &data) {
 
       if (get_op == "ISBN") {
         data = op.substr(p + 1);
-        if(check_no_blank(data.c_str())) {
+        if (check_no_blank(data.c_str())) {
           return INFO::ISBN;
         }
         return INFO::dFualt;
       } else if (get_op == "name") {
         //去掉冒号
         if (p + 1 < l && op[p + 1] == '\"') {
-          int next_pos = op.find('\"',p + 2 );
+          int next_pos = op.find('\"', p + 2);
           if (next_pos == l - 1) {
-            int i = p+2;
+            int i = p + 2;
             int j = next_pos - p - 2;
-            data = op.substr(p + 2, next_pos - p - 2 );
-            if(check_no_blank_quation(data.c_str())) {
+            data = op.substr(p + 2, next_pos - p - 2);
+            if (check_no_blank_quation(data.c_str())) {
               return INFO::NAME;
             }
             return INFO::dFualt;
@@ -204,10 +197,10 @@ INFO getInfoType(const std::string &op, std::string &data) {
         return INFO::dFualt;
       } else if (get_op == "author") {
         if (p + 1 < l && op[p + 1] == '\"') {
-          int next_pos = op.find('\"',p + 2 );
+          int next_pos = op.find('\"', p + 2);
           if (next_pos == l - 1) {
-            data = op.substr(p + 2, next_pos - p - 2 );
-            if(check_no_blank_quation(data.c_str())) {
+            data = op.substr(p + 2, next_pos - p - 2);
+            if (check_no_blank_quation(data.c_str())) {
               return INFO::AUTHOR;
             }
             return INFO::AUTHOR;
@@ -216,10 +209,10 @@ INFO getInfoType(const std::string &op, std::string &data) {
         return INFO::dFualt;
       } else if (get_op == "keyword") {
         if (p + 1 < l && op[p + 1] == '\"') {
-          int next_pos = op.find('\"',p + 2);
+          int next_pos = op.find('\"', p + 2);
           if (next_pos == l - 1) {
-            data = op.substr(p + 2, next_pos - p - 2 );
-            if(check_no_blank_quation(data.c_str())) {
+            data = op.substr(p + 2, next_pos - p - 2);
+            if (check_no_blank_quation(data.c_str())) {
               return INFO::KETWORD;
             }
             return INFO::dFualt;
@@ -257,26 +250,25 @@ void splitOrder(std::string &input, std::vector<std::string> &orders) {
     tmp = input.substr(i, j - i);
     tmp += "\0";
     orders.push_back(tmp);
-    i = j+1;
+    i = j + 1;
   }
 }
-
 
 void Run(user &user_, book &book_, Profit &_log_profit) {
   std::string input;
   std::vector<std::string> orders;
   std::vector<Statement> state;
   //保存当前选择的图书
-  aBook book_tmp;
+  book::Book nowBook;
+  //保存当前选择图书的ISBN
+  std::string ISBN;
   //保存当前登录的用户
   std::string userId;
   //当前权限
   int now_privilege = 0;
   int now_bookPos = -1;
   int l; //指令参数计数器
-#ifdef DEBUG
-  int count  = 0;
-#endif
+
 
   while (true) {
 #ifdef DEBUG
@@ -291,43 +283,50 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
       } else {
         splitOrder(input, orders);
         l = orders.size();
-
         //User
         if (orders[0] == "su") {
           int privilege_;
           bool success_login = false;
           if (l == 2) {
-              success_login = user_.login(orders[1].c_str(), privilege_);
+            success_login = user_.login(orders[1].c_str(), privilege_);
           } else if (l == 3) {
             success_login = user_.login(orders[1].c_str(), privilege_, orders[2].c_str());
           } else {
             throw defualtError("Invalid\n");
           }
           if (success_login) {
+            if(!state.empty()) { // 非空 需要更新用户状态
+              state.back().book_Pos = now_bookPos;
+              state.back().ISBN = ISBN;
+            }
             //登陆成功 就压栈 栈顶为当前登陆用户
             userId = orders[1];
             now_bookPos = -1;
             now_privilege = privilege_;
             //有账户压栈
-              state.push_back({now_privilege, now_bookPos, book_tmp, userId});
-            //change state
-          } else {
+            state.push_back({now_privilege, now_bookPos, ISBN, userId});
+          }
+          else {
             throw defualtError("Invalid\n");
           }
         }
         else if (orders[0] == "logout") {
           if (l > 1 | now_privilege == 0) {
             throw defualtError("Invalid\n");
-          } else {
+          }
+          else {
             state.pop_back();
             if (state.empty()) {
               now_privilege = 0;
               userId[0] = '\0';
+              ISBN[0] = '\0';
               now_bookPos = -1;
             } else {
               userId = state.back().userId;
               now_privilege = state.back().nowPrivilige;
-              book_tmp = state.back()._abook;
+              now_bookPos = state.back().book_Pos;
+              ISBN = state.back().ISBN;
+              book_.select(nowBook,ISBN.c_str(),now_bookPos);
             }
           }
         }
@@ -335,78 +334,72 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           if (l != 4) {
             throw defualtError("Invalid\n");
           } else {
-            if(check_only_(orders[1].c_str())&&check_only_(orders[2].c_str())&&check_no_blank(orders[3].c_str())) {
+            if (check_only_(orders[1].c_str()) && check_only_(orders[2].c_str()) && check_no_blank(orders[3].c_str())) {
               if (!user_.addUser(orders[1].c_str(), orders[3].c_str(), 1, orders[2].c_str())) {
                 throw defualtError("Invalid\n");
               }
-            }else {
+            } else {
               throw defualtError("Invalid\n");
             }
-
           }
         }
         else if (orders[0] == "passwd") {
           if (l > 4 || now_privilege == 0) {
             throw defualtError("Invalid\n");
           } else {
-            if (l == 3) {//有没有修改密码为空的情况
-              if(now_privilege  == 7) {
-                if(check_only_(orders[2].c_str())) {
+            if (l == 3) {
+              //有没有修改密码为空的情况
+              if (now_privilege == 7) {
+                if (check_only_(orders[2].c_str())) {
                   if (!user_.modifyPasswd(orders[1].c_str(), orders[2].c_str())) {
                     throw defualtError("Invalid\n");
                   }
-                }else {
+                } else {
                   throw defualtError("Invalid\n");
                 }
-
-              }
-              else {
+              } else {
                 throw defualtError("Invalid\n");
               }
-            }
-            else if(l == 4){
-              if(check_only_(orders[3].c_str())) {
+            } else if (l == 4) {
+              if (check_only_(orders[3].c_str())) {
                 if (!user_.modifyPasswd(orders[1].c_str(), orders[3].c_str(), orders[2].c_str())) {
                   throw defualtError("Invalid\n");
                 }
-              }
-              else {
+              } else {
                 throw defualtError("Invalid\n");
               }
-            }
-            else {
+            } else {
               throw defualtError("Invalid\n");
             }
           }
         }
         else if (orders[0] == "useradd") {
-          if (l != 5 ) {
+          if (l != 5) {
             throw defualtError("Invalid\n");
           } else {
             int tmp = getInt(orders[3]);
             if (tmp == -1) {
               throw defualtError("Invalid\n");
             }
-            if(tmp >= now_privilege) {
+            if (tmp >= now_privilege) {
               throw defualtError("Invalid\n");
             }
-            if(check_only_(orders[1].c_str())&&check_no_blank(orders[4].c_str())&&check_only_(orders[2].c_str())) {
+            if (check_only_(orders[1].c_str()) && check_no_blank(orders[4].c_str()) && check_only_(orders[2].c_str())) {
               if (!user_.addUser(orders[1].c_str(), orders[4].c_str(), tmp, orders[2].c_str())) {
                 throw defualtError("Invalid\n");
               }
-            }
-            else {
+            } else {
               throw defualtError("Invalid\n");
             }
-
           }
         }
         else if (orders[0] == "delete") {
           if (l != 2 || orders[1] == userId || now_privilege < 7) {
             throw defualtError("Invalid\n");
           } else {
-            for(auto t = state.begin();t != state.end();++t) {//检测是否已经在登陆栈中
-              if(orders[1] == t->userId) {
+            for (auto t = state.begin(); t != state.end(); ++t) {
+              //检测是否已经在登陆栈中
+              if (orders[1] == t->userId) {
                 throw defualtError("Invalid\n");
               }
             }
@@ -415,7 +408,6 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             }
           }
         }
-
 
         //Book
         else if (orders[0] == "buy") {
@@ -439,17 +431,17 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           if (l != 2 || now_privilege < 3) {
             throw defualtError("Invalid\n");
           } else {
-            book_.selete(book_tmp._book, orders[1].c_str(), now_bookPos);
-            strcpy(book_tmp.ISBN, orders[1].c_str());
+            book_.select(nowBook, orders[1].c_str(), now_bookPos);
+            ISBN = orders[1];
+
           }
         }
         else if (orders[0] == "modify") {
-
           if (now_privilege < 2 || now_bookPos == -1) {
             throw defualtError("Invalid\n");
           } else {
             std::vector<std::string> datas;
-            double _price;//price 仅出现一次 保存避免二次求值
+            double _price; //price 仅出现一次 保存避免二次求值
             std::string tmp;
             INFO tmp_info;
             std::vector<INFO> infos;
@@ -458,9 +450,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               if (tmp_info == INFO::dFualt) {
                 throw defualtError("Invalid\n");
               } else {
-                if(tmp_info == PRICE) {
+                if (tmp_info == PRICE) {
                   _price = getDouble(tmp);
-                  if(_price <  0) {
+                  if (_price < 0) {
                     throw defualtError("Invalid\n");
                   }
                 }
@@ -477,36 +469,43 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
                   break;
                 }
                 case INFO::ISBN: {
-                  if (book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), now_bookPos, 1)) {
-                    strcpy(book_tmp.ISBN, datas[i - 1].c_str());
-                  } else {
+                  if (book_.modify(nowBook, ISBN.c_str(), datas[i - 1].c_str(), now_bookPos, 1)) {
+                    for(auto t = state.begin();t !=  state.end();++t) {
+                      if(t->ISBN == ISBN) {
+                        t->ISBN = datas[i-1];
+                      }
+                    }
+                    // TODO 有没有必要在外部放这么多东西， iSBN，nowPos 这些都在栈顶
+                     ISBN = datas[i-1];
+                  }
+                  else {
                     throw defualtError("Invalid\n");
                   }
                   break;
                 }
                 case INFO::NAME: {
-                  if (!book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), now_bookPos, 2)) {
+                  if (!book_.modify(nowBook, ISBN.c_str(), datas[i - 1].c_str(), now_bookPos, 2)) {
                     throw defualtError("Invalid\n");
                   }
                   break;
                 }
                 case INFO::AUTHOR: {
-                  if (!book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), now_bookPos, 3)) {
+                  if (!book_.modify(nowBook, ISBN.c_str(), datas[i - 1].c_str(), now_bookPos, 3)) {
                     throw defualtError("Invalid\n");
                   }
                   break;
                 }
                 case INFO::KETWORD: {
-                  if (!book_.modify(book_tmp._book, book_tmp.ISBN, datas[i - 1].c_str(), now_bookPos, 4)) {
+                  if (!book_.modify(nowBook, ISBN.c_str(), datas[i - 1].c_str(), now_bookPos, 4)) {
                     throw defualtError("Invalid\n");
                   }
                   break;
                 }
                 case INFO::PRICE: {
-                    if (!book_.modify(book_tmp._book, _price, now_bookPos)) {
-                      throw defualtError("Invalid\n");
-                    }
-                    break;
+                  if (!book_.modify(nowBook, _price, now_bookPos)) {
+                    throw defualtError("Invalid\n");
+                  }
+                  break;
                 }
               }
             }
@@ -521,11 +520,12 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             if (tmp < 0 || cost < 0) {
               throw defualtError("Invalid\n");
             } else {
-              book_.import(book_tmp._book, tmp, cost, now_bookPos);
-              _log_profit.save(cost * (-1) );
+              book_.import(nowBook, tmp, cost, now_bookPos);
+              _log_profit.save(cost * (-1));
             }
           }
         }
+
         //log
         else if (orders[0] == "show") {
           if (now_privilege < 1) {
@@ -550,37 +550,36 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           else if (l == 2) {
             //按条件打印对应图书
             //还有可能是finance
-            if(orders[1] == "finance") {
+            if (orders[1] == "finance") {
               _log_profit.read();
-            }
-            else{
-            //按条件打印对应图书
+            } else {
+              //按条件打印对应图书
               std::string data;
               switch (getInfoType(orders[1], data)) {
-              case INFO::dFualt: {
-                throw defualtError("Invalid\n");
-                break;
+                case INFO::dFualt: {
+                  throw defualtError("Invalid\n");
+                  break;
+                }
+                case INFO::ISBN: {
+                  book_.bookIndex.showAll(data.c_str(), 1);
+                  break;
+                }
+                case INFO::NAME: {
+                  book_.bookIndex.showAll(data.c_str(), 2);
+                  break;
+                }
+                case INFO::AUTHOR: {
+                  book_.bookIndex.showAll(data.c_str(), 3);
+                  break;
+                }
+                case INFO::KETWORD: {
+                  book_.bookIndex.showAll(data.c_str(), 4);
+                  break;
+                }
               }
-              case INFO::ISBN: {
-                book_.bookIndex.showAll(data.c_str(), 1);
-                break;
-              }
-              case INFO::NAME: {
-                book_.bookIndex.showAll(data.c_str(), 2);
-                break;
-              }
-              case INFO::AUTHOR: {
-                book_.bookIndex.showAll(data.c_str(), 3);
-                break;
-              }
-              case INFO::KETWORD: {
-                book_.bookIndex.showAll(data.c_str(), 4);
-                break;
-              }
-            }
             }
           } else if (l == 1) {
-            book_.bookIndex.showAll(book_tmp.ISBN, 0);
+            book_.bookIndex.showAll(ISBN.c_str(), 0);
           } else {
             throw defualtError("Invalid\n");
           }
@@ -590,36 +589,34 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
         else if (orders[0] == "quit" || orders[0] == "exit") {
           return;
         }
-        else {
+        else
+        {
           throw defualtError("Invalid\n");
         }
       }
-
     } catch (const defualtError &e) {
-      std::cout << e.what();
+#ifdef DEBUG
+      std::cout<<count<<":";
+#endif
+
+      std::cout <<e.what();
     }
   }
 }
 
 
- int main() {
-    // std::fstream file ;
-    // for(int i = 0;i<8;i++) {
-    //   file.open(Path[i],std::ios::out|std::ios::trunc);
-    //   file.close();
-    // }
-  // freopen("../testcases/advanced/testcase5/10.in","r",stdin);
-  // freopen("../testcases/advanced/testcase5/10.dns","w",stdout);
+int main() {
+
   // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);
   Profit _log_profit(Path[7]);
   // SystemLog _log_sys(Path[5]);
   // Operator _log_operator(Path[6]);
-
   try {
     Run(_user, _book, _log_profit);
-  } catch (...) {
   }
+  catch (...){}
+
   return 0;
 }

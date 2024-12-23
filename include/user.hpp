@@ -40,7 +40,7 @@ private:
   Index<User, 32> userIndex;
 
 public:
-  user(std::string index_path_, std::string block_path_): userIndex(1024, index_path_, block_path_) {
+  user(std::string index_path_, std::string block_path_):userIndex(1024, index_path_, block_path_) {
     userIndex.Initialise(); //首先初始化文件
     total_user = userIndex.getInfo(1); //数量统一放在文件的第一个位置处
     if (total_user == 0) {
