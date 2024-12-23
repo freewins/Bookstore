@@ -9,10 +9,14 @@
 #include"book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
+#define DEBUG
 #ifdef DEBUG
   int count  = 0 ;
 #endif
 //保存系统状态
+
+
+
 struct Statement {
   int nowPrivilige;
   int book_Pos;
@@ -28,14 +32,14 @@ enum INFO { ISBN, NAME, AUTHOR, KETWORD, PRICE, dFualt };
 
 const std::string Path[10] =
 {
-  "./Data/Index/userInfoIndex.index",
-  "./Data/Index/bookInfoIndex.index",
-  "./Data/basicInfo.data",
-  "./Data/bookInfo.data",
-  "./Data/userInfo.data",
-  "./Data/syslogInfo.data",
-  "./Data/operatorInfo.data",
-  "./Data/profitInfo.data"
+  "../Data/Index/userInfoIndex.index",
+  "../Data/Index/bookInfoIndex.index",
+  "../Data/basicInfo.data",
+  "../Data/bookInfo.data",
+  "../Data/userInfo.data",
+  "../Data/syslogInfo.data",
+  "../Data/operatorInfo.data",
+  "../Data/profitInfo.data"
 };
 
 class defualtError : public std::exception {
@@ -608,6 +612,10 @@ int main() {
     file.open(Path[i],std::ios::out|std::ios::trunc);
     file.close();
   }
+  // freopen("../testcases/basic/testcase3.in","r",stdin);
+  // freopen("../testcases/basic/testcase3.dns","w",stdout);
+  //auto start = std::chrono::high_resolution_clock::now();
+  // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);
   Profit _log_profit(Path[7]);
@@ -617,5 +625,10 @@ int main() {
     Run(_user, _book, _log_profit);
   }
   catch (...){}
+
+  // auto end = std::chrono::high_resolution_clock::now();
+  // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+  // freopen("/dev/tty","w",stdout);
+  //std::cout<<duration;
   return 0;
 }

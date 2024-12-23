@@ -8,7 +8,6 @@
 #include<cmath>
 #include <cstring>
 #include<fstream>
-#include<vector>
 #include<algorithm>
 #include "file.hpp"
 
@@ -36,6 +35,7 @@ Index<T, len, info>::Index(int blocksize, const std::string &indexname, const st
 template<typename T, int len, int info>
 Index<T, len, info>::~Index() {
   //析构 首先是要把所有链表存储到Index里面 然后进行析构
+  block_file.clear();
   block_file.close();
   Block *cur = head;
   Block *delete_p;
@@ -54,6 +54,7 @@ Index<T, len, info>::~Index() {
     cur = cur->next;
     delete delete_p;
   }
+  index_file.clear();
   index_file.close();
 }
 
@@ -70,7 +71,7 @@ void Index<T, len, info>::updateInfo(int n, int val) {
 //把索引中的文件读到内存里
 template<typename T, int len, int info>
 void Index<T, len, info>::Initialise() {
-  Block *temp = new Block;
+  Block *temp = new Block(0);
   temp->cur = -1;
   index_file.open(Indexnmame, std::ios::in | std::ios::binary);
   index_file.seekp(0, std::ios::end);
@@ -123,6 +124,7 @@ void Index<T, len, info>::Initialise() {
   }
   index_file.close();
   block_file.open(Blockname, std::ios::out | std::ios::in | std::ios::binary);
+
 }
 
 //进行合并
@@ -142,7 +144,8 @@ void Index<T, len, info>::Merge(Block *cur, Block *forcur) {
   }
   //进行合并
   if (cur->now_size + forcur->now_size < 2 * sqrBlocksize + 4) {
-    Data *pools = new Data[3 * sqrBlocksize];
+    Data *pools = new Data[cur ->now_size + 2]{0};
+    //memset(pools, 0, sizeof(Data) * (cur->now_size + 2));
     block_file.seekg(cur->cur , std::ios::beg);
     block_file.read(reinterpret_cast<char *>(pools), sizeof(Data) * cur->now_size);
     // for (int i = 0; i < cur->now_size; i++) {
@@ -256,14 +259,15 @@ bool Index<T, len, info>::insertData(const char *key, T &value) {
     strcpy(cur->max, key); //修改最大值
   }
   //说明数据在某一个块中小于其最大值
-  Data *pools = new Data[cur->now_size + 4];
+  Data *pools = new Data[cur->now_size + 4]{0};
+  //memset(pools ,0,sizeof(Data) * (cur ->now_size +4));
   block_file.seekp(cur->cur, std::ios::beg);
   //读入
   if (cur->now_size) {
     block_file.read(reinterpret_cast<char *>(pools), sizeof(Data) * cur->now_size);
     //看是否有重复值
     auto t = std::lower_bound(pools, pools + cur->now_size, temp);
-    if (strcmp(t->key, key) == 0) {
+    if (t != pools + cur ->now_size && strcmp(t->key, key) == 0) {
       delete [] pools;
       return false; //重复插入 错误
     }
