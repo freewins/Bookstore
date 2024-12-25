@@ -31,6 +31,10 @@ bool Profit::read(int k) {
   double outcome = 0;
   if (k == -1) {
     k = count;
+    if(k ==  0) {
+      printf("+ %.2lf - %.2lf\n", income, outcome);
+      return true;
+    }
   }
   if (k == 0) {
     std::cout << "\n";

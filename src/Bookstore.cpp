@@ -614,7 +614,8 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
                 }
               }
             }
-          } else if (l == 1) {
+          }
+          else if (l == 1) {
             book_.bookIndex.showAll(ISBN.c_str(), 0);
           } else {
             throw defualtError("Invalid\n");
