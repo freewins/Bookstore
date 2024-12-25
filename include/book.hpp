@@ -67,13 +67,16 @@ public:
       int cur = _new.find('|');
       int forcur = 0;
       if (cur == std::string::npos) {
-        eraseSpace(_new);
+        //eraseSpace(_new);
         strcpy(keyWord, _new.c_str());
         return true;
       } else {
         do {
           if (forcur != 0) forcur++;
           cur = _new.find('|', forcur);
+          if(cur == strlen(des) -1) {
+            return false;
+          }
           tmp = _new.substr(forcur, cur - forcur);
           eraseSpace(tmp);
           for (int i = 0; i < newKey.size(); i++) {

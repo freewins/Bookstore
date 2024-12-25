@@ -29,6 +29,9 @@ Index<T, len, info>::Index(int blocksize, const std::string &indexname, const st
     block_file.close();
     block_file.open(blockname, std::ios::out | std::ios::binary | std::ios::in);
   }
+  if(block_file.is_open()) {
+    ;
+  }
   block_file.close();
   offset = info * sizeof(int);
 }
