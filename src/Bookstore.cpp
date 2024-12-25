@@ -9,15 +9,6 @@
 #include"book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
-
-
-#ifdef DEBUG
-  int count  = 0 ;
-#endif
-//保存系统状态
-
-
-
 struct Statement {
   int nowPrivilige;
   int book_Pos;
@@ -62,8 +53,7 @@ double getDouble(const std::string &number);
 
 INFO getInfoType(const std::string &op, std::string &data);
 
-void Run(user &user_, book &book_, Profit &_log_profit,
-         SystemLog &_log_sys, Operator &_log_operator);
+void Run(user &user_, book &book_, Profit &_log_profit);
 
 void splitOrder(std::string &input, std::vector<std::string> &orders);
 
@@ -239,12 +229,18 @@ void splitOrder(std::string &input, std::vector<std::string> &orders) {
   int l = input.size();
   std::string tmp;
   orders.clear();
+
   while (i < l) {
     while (i < l && input[i] == ' ') {
       i++;
     }
-    if (i == l)
+    if (i == l) {
+      if(orders.empty()) {
+        orders.push_back("");
+      }
       return;
+    }
+
     int j = i;
     while (j < l && input[j] != ' ') {
       j++;
@@ -272,17 +268,14 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
   int l; //指令参数计数器
 
 
-  while (true) {
-#ifdef DEBUG
-    count ++;
-#endif
-
+  while (std::getline(std::cin, input)) {
     try {
-      std::getline(std::cin, input);
+
       if (input == "") {
-        return;
         continue;
-      } else {
+      }
+      else
+        {
         splitOrder(input, orders);
         l = orders.size();
         //User
@@ -425,10 +418,6 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               throw defualtError("Invalid\n");
             } else {
               _log_profit.save(total);
-#ifdef DEBUG
-              std::cout<<count<<":";
-#endif
-
               printf("%.2lf\n", total);
             }
           }
@@ -523,7 +512,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           } else {
             int tmp = getInt(orders[1]);
             double cost = getDouble(orders[2]);
-            if (tmp < 0 || cost < 0) {
+            if (tmp <= 0 || cost <= 0) {
               throw defualtError("Invalid\n");
             } else {
               book_.import(nowBook, tmp, cost, now_bookPos);
@@ -606,16 +595,15 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
         else if (orders[0] == "quit" || orders[0] == "exit") {
           return;
         }
+        else if(orders[0] == "") {
+          continue;
+        }
         else
         {
           throw defualtError("Invalid\n");
         }
       }
     } catch (const defualtError &e) {
-#ifdef DEBUG
-      std::cout<<count<<":";
-#endif
-
       std::cout <<e.what();
     }
   }
@@ -623,28 +611,13 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
 
 
 int main() {
-  // std::fstream file ;
-  // for(int i = 0;i<8;i++) {
-  //   file.open(Path[i],std::ios::out|std::ios::trunc);
-  //   file.close();
-  // }
-  // freopen("../testcases/complex/testcase4/2.in","r",stdin);
-  // freopen("../testcases/complex/testcase4/2.dns","w",stdout);
-  // auto start = std::chrono::high_resolution_clock::now();
   // //存储文件保存路径
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);
   Profit _log_profit(Path[7]);
-  // SystemLog _log_sys(Path[5]);
-  // Operator _log_operator(Path[6]);
   try {
     Run(_user, _book, _log_profit);
   }
   catch (...){}
-
-  // auto end = std::chrono::high_resolution_clock::now();
-  // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-  // freopen("/dev/tty","w",stdout);
-  //std::cout<<duration;
   return 0;
 }

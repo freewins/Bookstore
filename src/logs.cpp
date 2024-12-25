@@ -17,8 +17,8 @@ Profit::Profit(std::string profit_path_) : logProgift(profit_path_) {
 }
 
 Profit::~Profit() {
-  logProgift.write_info(count,2);
-  logProgift.write_info(now_cur,1);
+  logProgift.write_info(count, 2);
+  logProgift.write_info(now_cur, 1);
 }
 
 void Profit::save(double profit) {
@@ -50,7 +50,7 @@ bool Profit::read(int k) {
         outcome += pool[i];
       }
     }
-    if(outcome < 0) {
+    if (outcome < 0) {
       outcome = -outcome;
     }
     printf("+ %.2lf - %.2lf\n", income, outcome);
@@ -58,7 +58,6 @@ bool Profit::read(int k) {
     return true;
   }
 }
-
 
 Operator::Operator(std::string operator_path_): logOperator(operator_path_) {
   if (logOperator.firstOpen()) {
@@ -72,10 +71,9 @@ Operator::Operator(std::string operator_path_): logOperator(operator_path_) {
 }
 
 Operator::~Operator() {
-  logOperator.write_info(count,2);
-  logOperator.write_info(now_cur,1);
+  logOperator.write_info(count, 2);
+  logOperator.write_info(now_cur, 1);
 }
-
 
 void Operator::save(char *userId_, char *userName_, int op) {
   OpLog newOp(userId_, userName_, op);
@@ -83,7 +81,7 @@ void Operator::save(char *userId_, char *userName_, int op) {
   logOperator.write(newOp);
 }
 
-SystemLog::SystemLog(std::string syslog_path_) :logSystem(syslog_path_){
+SystemLog::SystemLog(std::string syslog_path_) : logSystem(syslog_path_) {
   if (logSystem.firstOpen()) {
     logSystem.initialise();
     count = 0;
@@ -95,8 +93,8 @@ SystemLog::SystemLog(std::string syslog_path_) :logSystem(syslog_path_){
 }
 
 SystemLog::~SystemLog() {
-  logSystem.write_info(count,2);
-  logSystem.write_info(now_cur,1);
+  logSystem.write_info(count, 2);
+  logSystem.write_info(now_cur, 1);
 }
 
 #endif
