@@ -87,7 +87,6 @@ bool check_only_(const char *s) {
 }
 
 //检查是否有空格或者引号
-
 bool check_no_blank_quation(const char *s) {
   int l = strlen(s);
   for (int i = 0; i < l; i++) {
@@ -96,6 +95,17 @@ bool check_no_blank_quation(const char *s) {
     }
   }
   return true;
+}
+
+//检查是否有重复key true 说明存在重复key 值
+bool check_mulkey(std::string &key) {
+  int c= key.find('|');
+  if(c != std::string::npos) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 
@@ -454,6 +464,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             std::vector<INFO> infos;
             for (int i = 1; i < l; i++) {
               tmp_info = getInfoType(orders[i], tmp);
+              if(tmp == "") {
+                throw defualtError("Invalid\n");
+              }
               if (tmp_info == INFO::dFualt) {
                 throw defualtError("Invalid\n");
               } else {
@@ -548,10 +561,6 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               if (tmp == -1) {
                 throw defualtError("Invalid\n");
               } else {
-#ifdef DEBUG
-  std::cout<<count<<":";
-#endif
-
                 if(!_log_profit.read(tmp)) {
                   throw defualtError("Invalid\n");
                 }
@@ -573,7 +582,12 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             } else {
               //按条件打印对应图书
               std::string data;
-              switch (getInfoType(orders[1], data)) {
+              INFO tmp_info = getInfoType(orders[1], data);
+              if(data == "") {
+                throw defualtError("Invalid\n");
+              }
+              switch (tmp_info) {
+                case INFO::PRICE:
                 case INFO::dFualt: {
                   throw defualtError("Invalid\n");
                   break;
@@ -591,6 +605,10 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
                   break;
                 }
                 case INFO::KETWORD: {
+                  //检查是否有重复key值
+                  if(check_mulkey(data)) {
+                    throw defualtError("Invalid\n");
+                  }
                   book_.bookIndex.showAll(data.c_str(), 4);
                   break;
                 }
