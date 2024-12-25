@@ -108,6 +108,17 @@ bool check_mulkey(std::string &key) {
   }
 }
 
+bool checkDouble(const std::string &number) {
+  for(int i = 0;i<number.length();i++) {
+    if((number[i] >='0'&&number[i]<='9')||number[i]=='.') {
+      continue;
+    }
+    else {
+      return false;
+    }
+  }
+  return true;
+}
 
 int getInt(const std::string &number) {
   int sum = 0;
@@ -128,11 +139,18 @@ int getInt(const std::string &number) {
 
 double getDouble(const std::string &number) {
   size_t pos = number.find('.');
+  if(!checkDouble(number)) {
+    return false;
+  }
   if (pos != std::string::npos && pos != 0 && pos != number.size() - 1) {
     //说明有小数点 分两部分读入
     double ans = 0;
     int flag = 1;
     int i = 0;
+    int check_more = number.find('.',pos + 1);
+    if(check_more != std::string::npos) {
+      return false;
+    }
     if (number[i] == '-') {
       flag = -1;
       i = 1;
