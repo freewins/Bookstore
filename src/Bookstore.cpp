@@ -149,7 +149,7 @@ int getInt(const std::string &number) {
 double getDouble(const std::string &number) {
   size_t pos = number.find('.');
   if(!checkDouble(number)) {
-    return false;
+    return -1;
   }
   if (pos != std::string::npos && pos != 0 && pos != number.size() - 1) {
     //说明有小数点 分两部分读入
@@ -158,7 +158,7 @@ double getDouble(const std::string &number) {
     int i = 0;
     int check_more = number.find('.',pos + 1);
     if(check_more != std::string::npos) {
-      return false;
+      return -1;
     }
     if (number[i] == '-') {
       flag = -1;
