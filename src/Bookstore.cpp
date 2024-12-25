@@ -128,7 +128,7 @@ int getInt(const std::string &number) {
 
 double getDouble(const std::string &number) {
   size_t pos = number.find('.');
-  if (pos != std::string::npos) {
+  if (pos != std::string::npos && pos != 0 && pos != number.size() - 1) {
     //说明有小数点 分两部分读入
     double ans = 0;
     int flag = 1;
