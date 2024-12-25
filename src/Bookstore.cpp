@@ -109,7 +109,12 @@ bool check_mulkey(std::string &key) {
 }
 
 bool checkDouble(const std::string &number) {
-  for(int i = 0;i<number.length();i++) {
+  int i = 0;
+  if(number[i] == '-')i++;
+  if( i== number.length()) {
+    return false;
+  }
+  for(;i<number.length();i++) {
     if((number[i] >='0'&&number[i]<='9')||number[i]=='.') {
       continue;
     }
@@ -490,7 +495,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               } else {
                 if (tmp_info == PRICE) {
                   _price = getDouble(tmp);
-                  if (_price <= 0) {
+                  if (_price < 0) {
                     throw defualtError("Invalid\n");
                   }
                 }
