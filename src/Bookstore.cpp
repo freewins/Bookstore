@@ -2,7 +2,6 @@
 #include<string>
 #include<vector>
 #include<cctype>
-#include<cmath>
 #include<fstream>
 #include<exception>
 #include<chrono>
@@ -10,6 +9,10 @@
 #include"book.cpp"
 #include "file.cpp"
 #include "logs.cpp"
+
+#ifdef DEBUG
+int count = 0;
+#endif
 struct Statement {
   int nowPrivilige;
   int book_Pos;
@@ -142,15 +145,7 @@ int getInt(const std::string &number) {
 
   return sum * flag;
 }
-bool isInt(double num) {
-  double tmp = floor(num);
-  if(num - tmp >=0.001) {
-    return false;
-  }
-  else {
-    return true;
-  }
-}
+
 double getDouble(const std::string &number) {
   size_t pos = number.find('.');
   if(!checkDouble(number)) {
@@ -311,6 +306,10 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
 
 
   while (std::getline(std::cin, input)) {
+#ifdef DEBUG
+    count++;
+#endif
+
     try {
 
       if (input == "") {
@@ -509,7 +508,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               } else {
                 if (tmp_info == PRICE) {
                   _price = getDouble(tmp);
-                  if (_price <= 0) {
+                  if (_price < 0) {
                     throw defualtError("Invalid\n");
                   }
                 }
@@ -677,14 +676,17 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
         }
       }
     } catch (const defualtError &e) {
+#ifdef DEBUG
+      std::cout<<count<<":";
+#endif
+
       std::cout <<e.what();
     }
   }
 }
-
-
 int main() {
   // //存储文件保存路径
+
   user _user(Path[0], Path[4]);
   book _book(Path[1], Path[3]);
   Profit _log_profit(Path[7]);
