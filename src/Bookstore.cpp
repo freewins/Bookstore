@@ -476,6 +476,11 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
                     throw defualtError("Invalid\n");
                   }
                 }
+                for(auto t : infos) {
+                  if(t == tmp_info) {
+                    throw defualtError("Invalid\n");
+                  }
+                }
                 infos.push_back(tmp_info);
                 datas.push_back(tmp);
               }
