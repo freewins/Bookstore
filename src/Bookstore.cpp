@@ -2,6 +2,7 @@
 #include<string>
 #include<vector>
 #include<cctype>
+#include<cmath>
 #include<fstream>
 #include<exception>
 #include<chrono>
@@ -141,7 +142,15 @@ int getInt(const std::string &number) {
 
   return sum * flag;
 }
-
+bool isInt(double num) {
+  double tmp = floor(num);
+  if(num - tmp >=0.001) {
+    return false;
+  }
+  else {
+    return true;
+  }
+}
 double getDouble(const std::string &number) {
   size_t pos = number.find('.');
   if(!checkDouble(number)) {
@@ -317,6 +326,11 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           bool success_login = false;
           if (l == 2) {
             success_login = user_.login(orders[1].c_str(), privilege_);
+            if(success_login) {
+              if( now_privilege <= privilege_) {
+                success_login = false;
+              }
+            }
           } else if (l == 3) {
             success_login = user_.login(orders[1].c_str(), privilege_, orders[2].c_str());
           } else {
@@ -495,7 +509,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               } else {
                 if (tmp_info == PRICE) {
                   _price = getDouble(tmp);
-                  if (_price < 0) {
+                  if (_price <= 0) {
                     throw defualtError("Invalid\n");
                   }
                 }

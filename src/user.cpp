@@ -20,13 +20,13 @@ bool user::login(const char *userId, int &privilege, const char *password) {
         return false;
       }
     } else {
-      if(privilege > tmp.privilege) {
-        privilege = tmp.privilege;
-        return  true;
-      }
-      if(tmp.password[0] !='\0') {
-        return false;
-      }
+      // if(privilege > tmp.privilege) {
+      //   privilege = tmp.privilege;
+      //   return  true;
+      // }
+      // if(tmp.password[0] !='\0') {
+      //   return false;
+      // }
       privilege = tmp.privilege;
       return true;
     }
