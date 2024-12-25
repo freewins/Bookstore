@@ -495,7 +495,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               } else {
                 if (tmp_info == PRICE) {
                   _price = getDouble(tmp);
-                  if (_price < 0) {
+                  if (_price <= 0) {
                     throw defualtError("Invalid\n");
                   }
                 }
