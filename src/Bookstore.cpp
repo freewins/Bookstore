@@ -33,7 +33,7 @@ const std::string Path[10] =
   "operatorInfo.data",
   "profitInfo.data"
 };
-
+const int ValidPrivilege[3] = {1,3,7};
 class defualtError : public std::exception {
 private:
   std::string message;
@@ -373,11 +373,23 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             throw defualtError("Invalid\n");
           } else {
             int tmp = getInt(orders[3]);
-            if (tmp == -1) {
+            if (tmp <= 0) {
               throw defualtError("Invalid\n");
             }
             if (tmp >= now_privilege) {
               throw defualtError("Invalid\n");
+            }
+            else {
+              bool is_valid = false;
+              for(int i = 0;i < 3;i++) {
+                if(ValidPrivilege[i] >= now_privilege)break;
+                if(tmp == ValidPrivilege[i]) {
+                  is_valid = true;
+                  break;
+                }
+              }
+              if(!is_valid)
+                throw defualtError("Invalid\n");
             }
             if (check_only_(orders[1].c_str()) && check_no_blank(orders[4].c_str()) && check_only_(orders[2].c_str())) {
               if (!user_.addUser(orders[1].c_str(), orders[4].c_str(), tmp, orders[2].c_str())) {
