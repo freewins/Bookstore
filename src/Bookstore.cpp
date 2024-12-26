@@ -129,6 +129,7 @@ bool checkDouble(const std::string &number) {
   return true;
 }
 
+
 int getInt(const std::string &number) {
   int sum = 0;
   int flag = 1;
@@ -146,24 +147,25 @@ int getInt(const std::string &number) {
   return sum * flag;
 }
 
+
 double getDouble(const std::string &number) {
   size_t pos = number.find('.');
   if(!checkDouble(number)) {
     return -1;
   }
+  double ans = 0;
+  int flag = 1;
+  int i = 0;
+  int check_more = number.find('.',pos + 1);
+  if(check_more != std::string::npos) {
+    return -1;
+  }
+  if (number[i] == '-') {
+    flag = -1;
+    i = 1;
+  }
   if (pos != std::string::npos && pos != 0 && pos != number.size() - 1) {
     //说明有小数点 分两部分读入
-    double ans = 0;
-    int flag = 1;
-    int i = 0;
-    int check_more = number.find('.',pos + 1);
-    if(check_more != std::string::npos) {
-      return -1;
-    }
-    if (number[i] == '-') {
-      flag = -1;
-      i = 1;
-    }
     for (; i < pos; i++) {
       if (number[i] <= '9' && number[i] >= '0') {
         ans = ans * 10 + (number[i] - '0');
@@ -187,8 +189,15 @@ double getDouble(const std::string &number) {
     }
     return flag * ans;
   } else {
-    double ans = getInt(number);
-    return ans;
+    int l = number.size();
+    for(;i<l;i++) {
+      if (number[i] >= '0' && number[i] <= '9') {
+        ans = ans * 10 + (number[i] -'0');
+      } else {
+        return -1;
+      }
+    }
+    return ans * flag;
   }
   return -1;
 }
@@ -275,7 +284,6 @@ INFO getInfoType(const std::string &op, std::string &data) {
     }
   }
 }
-
 void splitOrder(std::string &input, std::vector<std::string> &orders) {
   //用于分割指令 后面将这个函数放到lib中
   int i = 0;
