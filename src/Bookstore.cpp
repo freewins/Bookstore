@@ -251,7 +251,9 @@ INFO getInfoType(const std::string &op, std::string &data) {
             if (check_no_blank_quation(data.c_str())) {
               return INFO::AUTHOR;
             }
-            return INFO::AUTHOR;
+            else {
+              return INFO::dFualt;
+            }
           }
         }
         return INFO::dFualt;
@@ -351,7 +353,11 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             if(orders[1].size() > 30 ) {
               throw defualtError("Invalid\n");
             }
-            success_login = user_.login(orders[1].c_str(), privilege_);
+            if(check_only_(orders[1].c_str())) {
+              success_login = user_.login(orders[1].c_str(), privilege_);
+            }else {
+              throw defualtError("Invalid\n");
+            }
             if(success_login) {
               if( now_privilege <= privilege_) {
                 success_login = false;
@@ -362,7 +368,12 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             if(orders[1].size() > 30 || orders[2].size() > 30) {
               throw defualtError("Invalid\n");
             }
-            success_login = user_.login(orders[1].c_str(), privilege_, orders[2].c_str());
+            if(check_only_(orders[1].c_str())&&check_only_(orders[2].c_str())) {
+              success_login = user_.login(orders[1].c_str(), privilege_, orders[2].c_str());
+            }
+            else {
+              throw defualtError("Invalid\n");
+            }
           } else {
             throw defualtError("Invalid\n");
           }
@@ -422,13 +433,14 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           if (l > 4 || now_privilege == 0) {
             throw defualtError("Invalid\n");
           } else {
-            if(orders[1].size()> 30 || orders[2].size() > 30) {
-              throw defualtError("Invalid\n");
-            }
+
             if (l == 3) {
+              if(orders[1].size() > 30 || orders[2].size() > 30) {
+                throw defualtError("Invalid\n");
+              }
               //有没有修改密码为空的情况
               if (now_privilege == 7) {
-                if (check_only_(orders[2].c_str())) {
+                if (check_only_(orders[1].c_str())&&check_only_(orders[2].c_str()) ) {
                   if (!user_.modifyPasswd(orders[1].c_str(), orders[2].c_str())) {
                     throw defualtError("Invalid\n");
                   }
@@ -439,10 +451,10 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
                 throw defualtError("Invalid\n");
               }
             } else if (l == 4) {
-              if(orders[3].size()>30) {
+              if(orders[1].size()> 30 || orders[2].size() > 30||orders[3].size()>30) {
                 throw defualtError("Invalid\n");
               }
-              if (check_only_(orders[3].c_str())) {
+              if (check_only_(orders[1].c_str())&&check_only_(orders[3].c_str()) && check_only_(orders[2].c_str())) {
                 if (!user_.modifyPasswd(orders[1].c_str(), orders[3].c_str(), orders[2].c_str())) {
                   throw defualtError("Invalid\n");
                 }
@@ -497,15 +509,20 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             if(orders[1].size() > 30) {
               throw defualtError("Invalid\n");
             }
-            for (auto t = state.begin(); t != state.end(); ++t) {
-              //检测是否已经在登陆栈中
-              if (orders[1] == t->userId) {
+            if(check_only_(orders[1].c_str())) {
+              for (auto t = state.begin(); t != state.end(); ++t) {
+                //检测是否已经在登陆栈中
+                if (orders[1] == t->userId) {
+                  throw defualtError("Invalid\n");
+                }
+              }
+              if (!user_.daleteUser(orders[1].c_str())) {
                 throw defualtError("Invalid\n");
               }
-            }
-            if (!user_.daleteUser(orders[1].c_str())) {
+            }else {
               throw defualtError("Invalid\n");
             }
+
           }
         }
 
@@ -515,6 +532,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             throw defualtError("Invalid\n");
           } else {
             if(orders[1].size() > 20 || orders[2].size() > 10) {
+              throw defualtError("Invalid\n");
+            }
+            if(!check_no_blank(orders[1].c_str())) {
               throw defualtError("Invalid\n");
             }
             int tmp = getInt(orders[2]);
@@ -537,13 +557,16 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
             if(orders[1].size() > 20) {
               throw defualtError("Invalid\n");
             }
+            if(check_no_blank(orders[1].c_str())) {
+              throw defualtError("Invalid\n");
+            }
             book_.select(nowBook, orders[1].c_str(), now_bookPos);
             ISBN = orders[1];
 
           }
         }
         else if (orders[0] == "modify") {
-          if (now_privilege < 2 || now_bookPos == -1) {
+          if (now_privilege < 3 || now_bookPos == -1) {
             throw defualtError("Invalid\n");
           } else {
             std::vector<std::string> datas;
