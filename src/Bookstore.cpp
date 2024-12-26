@@ -251,7 +251,7 @@ INFO getInfoType(const std::string &op, std::string &data) {
             if (check_no_blank_quation(data.c_str())) {
               return INFO::AUTHOR;
             }
-            return INFO::AUTHOR;
+            return INFO::dFualt;
           }
         }
         return INFO::dFualt;
