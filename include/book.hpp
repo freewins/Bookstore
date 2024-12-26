@@ -78,7 +78,9 @@ public:
             return false;
           }
           tmp = _new.substr(forcur, cur - forcur);
-          eraseSpace(tmp);
+          if(tmp=="") {
+            return false;
+          }
           for (int i = 0; i < newKey.size(); i++) {
             if (tmp == newKey[i]) {
               return false;
