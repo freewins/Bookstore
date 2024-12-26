@@ -9,9 +9,16 @@
 
 bool user::login(const char *userId, int &privilege, const char *password) {
   bool is_find = false;
+  if(strlen(userId)> 30) {
+    return false;
+  }
+  if(password != nullptr && strlen(password) > 30) {
+    return false;
+  }
   User tmp = userIndex.findData(userId, is_find);
   if (is_find) {
     if (password != nullptr) {
+
       if (strcmp(password, tmp.password) == 0) {
         //TODO 需不需要密码的特判
         privilege = tmp.privilege;
@@ -49,6 +56,7 @@ bool user::daleteUser(const char *userId) {
 }
 
 bool user::addUser(const char *userId, const char *userName, int privilege, const char *password) {
+
   User tmp( password, userName,privilege);
   if( userIndex.insertData(userId, tmp)) {
     total_user++;

@@ -205,11 +205,15 @@ INFO getInfoType(const std::string &op, std::string &data) {
 
       if (get_op == "ISBN") {
         data = op.substr(p + 1);
+        if(data.size()>20) {
+          return INFO::dFualt;
+        }
         if (check_no_blank(data.c_str())) {
           return INFO::ISBN;
         }
         return INFO::dFualt;
-      } else if (get_op == "name") {
+      }
+      else if (get_op == "name") {
         //去掉冒号
         if (p + 1 < l && op[p + 1] == '\"') {
           int next_pos = op.find('\"', p + 2);
@@ -217,6 +221,9 @@ INFO getInfoType(const std::string &op, std::string &data) {
             int i = p + 2;
             int j = next_pos - p - 2;
             data = op.substr(p + 2, next_pos - p - 2);
+            if(data.size() > 60) {
+              return INFO::dFualt;
+            }
             if (check_no_blank_quation(data.c_str())) {
               return INFO::NAME;
             }
@@ -229,6 +236,9 @@ INFO getInfoType(const std::string &op, std::string &data) {
           int next_pos = op.find('\"', p + 2);
           if (next_pos == l - 1) {
             data = op.substr(p + 2, next_pos - p - 2);
+            if(data.size()>60) {
+              return INFO::dFualt;
+            }
             if (check_no_blank_quation(data.c_str())) {
               return INFO::AUTHOR;
             }
@@ -241,6 +251,9 @@ INFO getInfoType(const std::string &op, std::string &data) {
           int next_pos = op.find('\"', p + 2);
           if (next_pos == l - 1) {
             data = op.substr(p + 2, next_pos - p - 2);
+            if(data.size() > 60) {
+              return INFO::dFualt;
+            }
             if (check_no_blank_quation(data.c_str())) {
               return INFO::KETWORD;
             }
@@ -250,6 +263,9 @@ INFO getInfoType(const std::string &op, std::string &data) {
         return INFO::dFualt;
       } else if (get_op == "price") {
         data = op.substr(p + 1);
+        if(data.size() > 13) {
+          return INFO::dFualt;
+        }
         return INFO::PRICE;
       } else {
         return INFO::dFualt;
@@ -324,13 +340,20 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           int privilege_;
           bool success_login = false;
           if (l == 2) {
+            if(orders[1].size() > 30 ) {
+              throw defualtError("Invalid\n");
+            }
             success_login = user_.login(orders[1].c_str(), privilege_);
             if(success_login) {
               if( now_privilege <= privilege_) {
                 success_login = false;
               }
             }
-          } else if (l == 3) {
+          }
+          else if (l == 3) {
+            if(orders[1].size() > 30 || orders[2].size() > 30) {
+              throw defualtError("Invalid\n");
+            }
             success_login = user_.login(orders[1].c_str(), privilege_, orders[2].c_str());
           } else {
             throw defualtError("Invalid\n");
@@ -375,6 +398,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           if (l != 4) {
             throw defualtError("Invalid\n");
           } else {
+            if(orders[1].size() > 30 || orders[2].size() > 30 ||orders[3] .size() >30) {
+              throw defualtError("Invalid\n");
+            }
             if (check_only_(orders[1].c_str()) && check_only_(orders[2].c_str()) && check_no_blank(orders[3].c_str())) {
               if (!user_.addUser(orders[1].c_str(), orders[3].c_str(), 1, orders[2].c_str())) {
                 throw defualtError("Invalid\n");
@@ -388,6 +414,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           if (l > 4 || now_privilege == 0) {
             throw defualtError("Invalid\n");
           } else {
+            if(orders[1].size()> 30 || orders[2].size() > 30) {
+              throw defualtError("Invalid\n");
+            }
             if (l == 3) {
               //有没有修改密码为空的情况
               if (now_privilege == 7) {
@@ -402,6 +431,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
                 throw defualtError("Invalid\n");
               }
             } else if (l == 4) {
+              if(orders[3].size()>30) {
+                throw defualtError("Invalid\n");
+              }
               if (check_only_(orders[3].c_str())) {
                 if (!user_.modifyPasswd(orders[1].c_str(), orders[3].c_str(), orders[2].c_str())) {
                   throw defualtError("Invalid\n");
@@ -418,6 +450,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           if (l != 5) {
             throw defualtError("Invalid\n");
           } else {
+            if(orders[1].size() > 30 || orders[2].size() > 30|| orders[4].size() > 30 || orders[3].size() > 1) {
+              throw defualtError("Invalid\n");
+            }
             int tmp = getInt(orders[3]);
             if (tmp <= 0) {
               throw defualtError("Invalid\n");
@@ -437,6 +472,7 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               if(!is_valid)
                 throw defualtError("Invalid\n");
             }
+
             if (check_only_(orders[1].c_str()) && check_no_blank(orders[4].c_str()) && check_only_(orders[2].c_str())) {
               if (!user_.addUser(orders[1].c_str(), orders[4].c_str(), tmp, orders[2].c_str())) {
                 throw defualtError("Invalid\n");
@@ -450,6 +486,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           if (l != 2 || orders[1] == userId || now_privilege < 7) {
             throw defualtError("Invalid\n");
           } else {
+            if(orders[1].size() > 30) {
+              throw defualtError("Invalid\n");
+            }
             for (auto t = state.begin(); t != state.end(); ++t) {
               //检测是否已经在登陆栈中
               if (orders[1] == t->userId) {
@@ -467,6 +506,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           if (l != 3 || now_privilege == 0) {
             throw defualtError("Invalid\n");
           } else {
+            if(orders[1].size() > 20 || orders[2].size() > 10) {
+              throw defualtError("Invalid\n");
+            }
             int tmp = getInt(orders[2]);
             if (tmp <= 0) {
               throw defualtError("Invalid\n");
@@ -484,6 +526,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           if (l != 2 || now_privilege < 3) {
             throw defualtError("Invalid\n");
           } else {
+            if(orders[1].size() > 20) {
+              throw defualtError("Invalid\n");
+            }
             book_.select(nowBook, orders[1].c_str(), now_bookPos);
             ISBN = orders[1];
 
@@ -576,6 +621,9 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
           if (l != 3 || now_privilege < 3 || now_bookPos == -1) {
             throw defualtError("Invalid\n");
           } else {
+            if(orders[1].size() > 10 || orders[2].size() >13) {
+              throw defualtError("Invalid\n");
+            }
             int tmp = getInt(orders[1]);
             double cost = getDouble(orders[2]);
             if (tmp <= 0 || cost <= 0) {
@@ -598,6 +646,8 @@ void Run(user &user_, book &book_, Profit &_log_profit) {
               if (now_privilege < 7) {
                 throw defualtError("Invalid\n");
               }
+              if(orders[2].size() > 10)
+                throw defualtError("Invalid\n");
               int tmp = getInt(orders[2]);
               if (tmp == -1) {
                 throw defualtError("Invalid\n");
