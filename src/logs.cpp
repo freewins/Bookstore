@@ -1,6 +1,7 @@
 //
 // Created by Freewings on 2024/12/15.
 //
+#include <memory_resource>
 #ifndef LOGS_CPP
 #define LOGS_CPP
 #include "logs.hpp"
@@ -23,7 +24,15 @@ Profit::~Profit() {
 
 void Profit::save(double profit) {
   count++;
-  now_cur = logProgift.write(profit);
+  financeLog fo;
+  fo.profit = profit;
+  if(profit < 0) {
+    fo.op_ = 0;
+  }
+  else {
+    fo.op_ = 1;
+  }
+  now_cur = logProgift.write(fo);
 }
 
 bool Profit::read(int k) {
@@ -45,13 +54,13 @@ bool Profit::read(int k) {
   } else {
     //要读入全部的数据log
     //TODO 写一个读特定长度数据的函数
-    double *pool = new double[k + 2];
+    financeLog *pool = new financeLog[k + 2];
     logProgift.read_block(pool, k, count);
     for (int i = 0; i < k; i++) {
-      if (pool[i] >= 0) {
-        income += pool[i];
+      if (pool[i].profit >= 0) {
+        income += pool[i].profit;
       } else {
-        outcome += pool[i];
+        outcome += pool[i].profit;
       }
     }
     if (outcome < 0) {
@@ -61,6 +70,46 @@ bool Profit::read(int k) {
     delete[] pool;
     return true;
   }
+}
+//打印财务报表
+void Profit::print() {
+  int k = count;
+  int i = 1,j = 32;
+  double income = 0;
+  double outcome = 0;
+  financeLog *pool = new financeLog[34];
+  std::cout<<"\t Opertor \t\t Total \n";
+  for(;i * j<=k;i++) {
+    if( i *  j <= k) {
+      logProgift.read_block(pool, j, count - (i - 1) * j);
+    }
+    for(int t = 0;t < j; t++) {
+      if(pool[t].op_ == 1) {
+        std::cout<<"\t BUY \t"<< pool[t].profit<<"\n";
+        income += pool[t].profit;
+      }
+      else if(pool[t].op_ == 0) {
+        std::cout<<"\t IMPORT \t"<< pool[t].profit<<"\n";
+        outcome+= pool[t].profit;
+      }
+    }
+  }
+  if( i * j != k) {
+    int f = k - ( i - 1) * j;
+    logProgift.read_block(pool,f,count - ( i - 1) * j);
+    for(int t = 0;t < f; t++) {
+      if(pool[t].op_ == 1) {
+        std::cout<<"\t BUY \t"<< pool[t].profit<<"\n";
+        income += pool[t].profit;
+      }
+      else if(pool[t].op_ == 0) {
+        std::cout<<"\t IMPORT \t"<< pool[t].profit<<"\n";
+        outcome+= pool[t].profit;
+      }
+    }
+
+  }
+  std::cout<<"\t + "<<income <<"\t + "<<outcome<<"\n";
 }
 
 Operator::Operator(std::string operator_path_): logOperator(operator_path_) {
@@ -78,11 +127,101 @@ Operator::~Operator() {
   logOperator.write_info(count, 2);
   logOperator.write_info(now_cur, 1);
 }
-
-void Operator::save(char *userId_, char *userName_, int op) {
-  OpLog newOp(userId_, userName_, op);
+//保留员工操作
+// op = 1 buy op = 2 Modify op = 3 create_user op = 4 register op = 5 passwd
+void Operator::save(const char *userId_, int op) {
+  OpLog newOp(userId_, op);
   count++;
   logOperator.write(newOp);
+}
+//输出k个员工操作
+void Operator::read(int k ) {
+  if(k == -1) {
+    //全部输出
+    k = count;
+  }
+  if( k == 0) {
+    std::cout<<"\n";
+    return;
+  }
+  int i = 1,j = 32;
+  Operator::OpLog *pool = new Operator::OpLog[34]{};
+  for(;i * j<=k;i++) {
+
+    if( i *  j <= k) {
+      logOperator.read_block(pool, j, count - (i - 1) * j);
+    }
+    for(int t = 0; t < j; t ++) {
+      std::cout<<pool[t].userId;
+      switch (pool[t].op_) {
+        case 1: {
+          std::cout<<"\tOrperation: BUY";
+          break;
+        }
+        case 2: {
+          std::cout<<"\tOrperation: MODIFY";
+          break;
+        }
+        case 3: {
+          std::cout<<"\tOrperation: IMPORT";
+          break;
+        }
+        case 4: {
+          std::cout<<"\tOrperation: CREATE_USER";
+          break;
+        }
+        case 5: {
+          std::cout<<"\tOrperation: REGISTER";
+          break;
+        }
+        case 6: {
+          std::cout<<"\tOrperation: PASSWORD";
+          break;
+        }
+      }
+      std::cout<<"\t"<<pool[t].opTime.tm_year+1900 <<"/"<<
+        pool[t].opTime.tm_mon + 1<<"/"<<
+          pool[t].opTime.tm_mday<<" - "<<
+            pool[t].opTime.tm_hour<<":"<<pool[t].opTime.tm_min<<"\t\n";
+    }
+  }
+  if( i * j != k) {
+    int f = k - ( i - 1) * j;
+    logOperator.read_block(pool,f,count - ( i - 1) * j);
+    for(int t = 0; t < f; t ++) {
+      std::cout<<pool[t].userId;
+      switch (pool[t].op_) {
+        case 1: {
+          std::cout<<"\tOrperation: BUY";
+          break;
+        }
+        case 2: {
+          std::cout<<"\tOrperation: MODIFY";
+          break;
+        }
+        case 3: {
+          std::cout<<"\tOrperation: IMPORT";
+          break;
+        }
+        case 4: {
+          std::cout<<"\tOrperation: CREATE_USER";
+          break;
+        }
+        case 5: {
+          std::cout<<"\tOrperation: REGISTER";
+          break;
+        }
+        case 6: {
+          std::cout<<"\tOrperation: PASSWORD";
+          break;
+        }
+      }
+      std::cout<<"\t"<<pool[t].opTime.tm_year+1900 <<"/"<<
+        pool[t].opTime.tm_mon + 1<<"/"<<
+          pool[t].opTime.tm_mday<<" - "<<
+            pool[t].opTime.tm_hour<<":"<<pool[t].opTime.tm_min<<"\t\n";
+    }
+  }
 }
 
 SystemLog::SystemLog(std::string syslog_path_) : logSystem(syslog_path_) {
@@ -100,5 +239,51 @@ SystemLog::~SystemLog() {
   logSystem.write_info(count, 2);
   logSystem.write_info(now_cur, 1);
 }
+
+//读取一定数量的系统日志
+void SystemLog::read(int k ) {
+  if(k == -1) {
+    //全部输出
+    k = count;
+  }
+  if( k == 0) {
+    std::cout<<"\n";
+    return;
+  }
+  int i = 1,j = 32;
+  SystemLog::SysLog *pool = new SystemLog::SysLog[34];
+  for(;i * j<=k;i++) {
+
+    if( i *  j <= k) {
+      logSystem.read_block(pool, j, count - (i - 1) * j);
+    }
+    for(int t = 0; t < j; t ++) {
+      std::cout<<"\t"<<pool[t].userId<<"\t"<<pool[t].op;
+      std::cout<<"\t\t"<<pool[t].opTime.tm_year+1900 <<"/"<<
+        pool[t].opTime.tm_mon + 1<<"/"<<
+          pool[t].opTime.tm_mday<<" - "<<
+            pool[t].opTime.tm_hour<<":"<<pool[t].opTime.tm_min<<"\t\n";
+    }
+  }
+  if( i * j != k) {
+    int f = k - ( i - 1) * j;
+    logSystem.read_block(pool,f,count - ( i - 1) * j);
+    for(int t = 0 ;t < f;t++){
+      std::cout<<"\t"<<pool[t].userId<<"\t"<<
+         pool[t].op;
+      std::cout<<"\t\t"<<pool[t].opTime.tm_year+1900 <<"/"<<
+        pool[t].opTime.tm_mon + 1<<"/"<<
+          pool[t].opTime.tm_mday<<" - "<<
+            pool[t].opTime.tm_hour<<":"<<pool[t].opTime.tm_min<<"\t\n";
+    }
+  }
+}
+//写入系统日志 op代表操作 0 - 13
+void SystemLog::save(const char * userId_,int pri,int op) {
+  SysLog sys(userId_,pri,op);
+  logSystem.write(sys);
+  count++;
+}
+
 
 #endif
