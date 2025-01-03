@@ -88,10 +88,10 @@ void Profit::print() {
     }
     for (int t = 0; t < j; t++) {
       if (pool[t].op_ == 1) {
-        std::cout << std::setw(15) << "BUY" << std::setw(15) << pool[t].profit << "\n";
+        std::cout << std::setw(15) << "BUY" << "+"<< std::setw(15) << pool[t].profit << "\n";
         income += pool[t].profit;
       } else if (pool[t].op_ == 0) {
-        std::cout << std::setw(15) << "IMPORT" << std::setw(15) << pool[t].profit << "\n";
+        std::cout << std::setw(15) << "IMPORT"<<"-" << std::setw(15) << std::abs(pool[t].profit) << "\n";
         outcome += pool[t].profit;
       }
     }
@@ -101,10 +101,10 @@ void Profit::print() {
     logProgift.read_block(pool, f, count - (i - 1) * j);
     for (int t = 0; t < f; t++) {
       if (pool[t].op_ == 1) {
-        std::cout << std::setw(15) << "BUY" << std::setw(15) << pool[t].profit << "\n";
+        std::cout << std::setw(15) << "BUY" << "+"<<std::setw(15) << pool[t].profit << "\n";
         income += pool[t].profit;
       } else if (pool[t].op_ == 0) {
-        std::cout << std::setw(15) << "IMPORT" << std::setw(15) << pool[t].profit << "\n";
+        std::cout << std::setw(15) << "IMPORT" <<"-"<< std::setw(15) << std::abs(pool[t].profit) << "\n";
         outcome += pool[t].profit;
       }
     }
@@ -265,6 +265,7 @@ void SystemLog::read(int k) {
     std::cout << "\n";
     return;
   }
+  std::cout<<"--------------------------------log--------------------------------\n";
   std::cout << std::setfill(' ');
   int i = 1, j = 32;
   SystemLog::SysLog *pool = new SystemLog::SysLog[34];
