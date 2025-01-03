@@ -26,6 +26,7 @@ class Index {
     friend bool operator<(const Data &a, const Data &b) {
       return strcmp(a.key, b.key) < 0;
     }
+
     friend bool operator==(const Data &a, const Data &b) {
       return strcmp(a.key, b.key) == 0;
     }
@@ -111,8 +112,9 @@ public:
   ~LogFile();
 
   bool firstOpen();
+
   //除去info的offset
-  int getOffset() ;
+  int getOffset();
 
   void initialise(const std::string &FN = "");
 

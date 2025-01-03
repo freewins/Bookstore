@@ -2,6 +2,7 @@
 // Created by Freewings on 2024/12/15.
 //
 #include <memory_resource>
+#include<iomanip>
 #ifndef LOGS_CPP
 #define LOGS_CPP
 #include "logs.hpp"
@@ -26,10 +27,9 @@ void Profit::save(double profit) {
   count++;
   financeLog fo;
   fo.profit = profit;
-  if(profit < 0) {
+  if (profit < 0) {
     fo.op_ = 0;
-  }
-  else {
+  } else {
     fo.op_ = 1;
   }
   now_cur = logProgift.write(fo);
@@ -40,7 +40,7 @@ bool Profit::read(int k) {
   double outcome = 0;
   if (k == -1) {
     k = count;
-    if(k ==  0) {
+    if (k == 0) {
       printf("+ %.2lf - %.2lf\n", income, outcome);
       return true;
     }
@@ -71,45 +71,46 @@ bool Profit::read(int k) {
     return true;
   }
 }
+
 //打印财务报表
 void Profit::print() {
   int k = count;
-  int i = 1,j = 32;
+  int i = 1, j = 32;
   double income = 0;
   double outcome = 0;
   financeLog *pool = new financeLog[34];
-  std::cout<<"\t Opertor \t\t Total \n";
-  for(;i * j<=k;i++) {
-    if( i *  j <= k) {
+  std::cout << "---------Finance---------\n";
+  std::cout << std::setfill(' ');
+  std::cout << std::setw(15) << "Operator" << std::setw(15) << " Total" << "\n";
+  for (; i * j <= k; i++) {
+    if (i * j <= k) {
       logProgift.read_block(pool, j, count - (i - 1) * j);
     }
-    for(int t = 0;t < j; t++) {
-      if(pool[t].op_ == 1) {
-        std::cout<<"\t BUY \t"<< pool[t].profit<<"\n";
+    for (int t = 0; t < j; t++) {
+      if (pool[t].op_ == 1) {
+        std::cout << std::setw(15) << "BUY" << std::setw(15) << pool[t].profit << "\n";
         income += pool[t].profit;
-      }
-      else if(pool[t].op_ == 0) {
-        std::cout<<"\t IMPORT \t"<< pool[t].profit<<"\n";
-        outcome+= pool[t].profit;
+      } else if (pool[t].op_ == 0) {
+        std::cout << std::setw(15) << "IMPORT" << std::setw(15) << pool[t].profit << "\n";
+        outcome += pool[t].profit;
       }
     }
   }
-  if( i * j != k) {
-    int f = k - ( i - 1) * j;
-    logProgift.read_block(pool,f,count - ( i - 1) * j);
-    for(int t = 0;t < f; t++) {
-      if(pool[t].op_ == 1) {
-        std::cout<<"\t BUY \t"<< pool[t].profit<<"\n";
+  if (i * j != k) {
+    int f = k - (i - 1) * j;
+    logProgift.read_block(pool, f, count - (i - 1) * j);
+    for (int t = 0; t < f; t++) {
+      if (pool[t].op_ == 1) {
+        std::cout << std::setw(15) << "BUY" << std::setw(15) << pool[t].profit << "\n";
         income += pool[t].profit;
-      }
-      else if(pool[t].op_ == 0) {
-        std::cout<<"\t IMPORT \t"<< pool[t].profit<<"\n";
-        outcome+= pool[t].profit;
+      } else if (pool[t].op_ == 0) {
+        std::cout << std::setw(15) << "IMPORT" << std::setw(15) << pool[t].profit << "\n";
+        outcome += pool[t].profit;
       }
     }
-
   }
-  std::cout<<"\t + "<<income <<"\t + "<<outcome<<"\n";
+  std::cout << std::setfill('-') << std::setw(25) << "-" << "\n";
+  std::cout << " Income: " << income << " Outcome: " << std::abs(outcome) << "\n";
 }
 
 Operator::Operator(std::string operator_path_): logOperator(operator_path_) {
@@ -127,6 +128,7 @@ Operator::~Operator() {
   logOperator.write_info(count, 2);
   logOperator.write_info(now_cur, 1);
 }
+
 //保留员工操作
 // op = 1 buy op = 2 Modify op = 3 create_user op = 4 register op = 5 passwd
 void Operator::save(const char *userId_, int op) {
@@ -134,92 +136,93 @@ void Operator::save(const char *userId_, int op) {
   count++;
   logOperator.write(newOp);
 }
+
 //输出k个员工操作
-void Operator::read(int k ) {
-  if(k == -1) {
+void Operator::read(int k) {
+  if (k == -1) {
     //全部输出
     k = count;
   }
-  if( k == 0) {
-    std::cout<<"\n";
+  if (k == 0) {
+    std::cout << "\n";
     return;
   }
-  int i = 1,j = 32;
+  int i = 1, j = 32;
+  std::cout << std::setfill(' ');
   Operator::OpLog *pool = new Operator::OpLog[34]{};
-  for(;i * j<=k;i++) {
-
-    if( i *  j <= k) {
+  for (; i * j <= k; i++) {
+    if (i * j <= k) {
       logOperator.read_block(pool, j, count - (i - 1) * j);
     }
-    for(int t = 0; t < j; t ++) {
-      std::cout<<pool[t].userId;
+    for (int t = 0; t < j; t++) {
+      std::cout << std::setw(25) << pool[t].userId;
       switch (pool[t].op_) {
         case 1: {
-          std::cout<<"\tOrperation: BUY";
+          std::cout << std::setw(30) << "Orperation: BUY";
           break;
         }
         case 2: {
-          std::cout<<"\tOrperation: MODIFY";
+          std::cout << std::setw(30) << "Orperation: MODIFY";
           break;
         }
         case 3: {
-          std::cout<<"\tOrperation: IMPORT";
+          std::cout << std::setw(30) << "Orperation: IMPORT";
           break;
         }
         case 4: {
-          std::cout<<"\tOrperation: CREATE_USER";
+          std::cout << std::setw(30) << "Orperation: CREATE_USER";
           break;
         }
         case 5: {
-          std::cout<<"\tOrperation: REGISTER";
+          std::cout << std::setw(30) << "Orperation: REGISTER";
           break;
         }
         case 6: {
-          std::cout<<"\tOrperation: PASSWORD";
+          std::cout << std::setw(30) << "Orperation: PASSWORD";
           break;
         }
       }
-      std::cout<<"\t"<<pool[t].opTime.tm_year+1900 <<"/"<<
-        pool[t].opTime.tm_mon + 1<<"/"<<
-          pool[t].opTime.tm_mday<<" - "<<
-            pool[t].opTime.tm_hour<<":"<<pool[t].opTime.tm_min<<"\t\n";
+      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/" <<
+          pool[t].opTime.tm_mon + 1 << "/" <<
+          pool[t].opTime.tm_mday << " - " <<
+          pool[t].opTime.tm_hour << ":" << pool[t].opTime.tm_min << "\t\n";
     }
   }
-  if( i * j != k) {
-    int f = k - ( i - 1) * j;
-    logOperator.read_block(pool,f,count - ( i - 1) * j);
-    for(int t = 0; t < f; t ++) {
-      std::cout<<pool[t].userId;
+  if (i * j != k) {
+    int f = k - (i - 1) * j;
+    logOperator.read_block(pool, f, count - (i - 1) * j);
+    for (int t = 0; t < f; t++) {
+      std::cout << std::setw(25) << pool[t].userId;
       switch (pool[t].op_) {
         case 1: {
-          std::cout<<"\tOrperation: BUY";
+          std::cout << std::setw(30) << "Orperation: BUY";
           break;
         }
         case 2: {
-          std::cout<<"\tOrperation: MODIFY";
+          std::cout << std::setw(30) << "Orperation: MODIFY";
           break;
         }
         case 3: {
-          std::cout<<"\tOrperation: IMPORT";
+          std::cout << std::setw(30) << "Orperation: IMPORT";
           break;
         }
         case 4: {
-          std::cout<<"\tOrperation: CREATE_USER";
+          std::cout << std::setw(30) << "Orperation: CREATE_USER";
           break;
         }
         case 5: {
-          std::cout<<"\tOrperation: REGISTER";
+          std::cout << std::setw(30) << "Orperation: REGISTER";
           break;
         }
         case 6: {
-          std::cout<<"\tOrperation: PASSWORD";
+          std::cout << std::setw(30) << "Orperation: PASSWORD";
           break;
         }
       }
-      std::cout<<"\t"<<pool[t].opTime.tm_year+1900 <<"/"<<
-        pool[t].opTime.tm_mon + 1<<"/"<<
-          pool[t].opTime.tm_mday<<" - "<<
-            pool[t].opTime.tm_hour<<":"<<pool[t].opTime.tm_min<<"\t\n";
+      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/" <<
+          pool[t].opTime.tm_mon + 1 << "/" <<
+          pool[t].opTime.tm_mday << " - " <<
+          pool[t].opTime.tm_hour << ":" << pool[t].opTime.tm_min << "\t\n";
     }
   }
 }
@@ -241,46 +244,46 @@ SystemLog::~SystemLog() {
 }
 
 //读取一定数量的系统日志
-void SystemLog::read(int k ) {
-  if(k == -1) {
+void SystemLog::read(int k) {
+  if (k == -1) {
     //全部输出
     k = count;
   }
-  if( k == 0) {
-    std::cout<<"\n";
+  if (k == 0) {
+    std::cout << "\n";
     return;
   }
-  int i = 1,j = 32;
+  std::cout << std::setfill(' ');
+  int i = 1, j = 32;
   SystemLog::SysLog *pool = new SystemLog::SysLog[34];
-  for(;i * j<=k;i++) {
-
-    if( i *  j <= k) {
+  for (; i * j <= k; i++) {
+    if (i * j <= k) {
       logSystem.read_block(pool, j, count - (i - 1) * j);
     }
-    for(int t = 0; t < j; t ++) {
-      std::cout<<"\t"<<pool[t].userId<<"\t"<<pool[t].op;
-      std::cout<<"\t\t"<<pool[t].opTime.tm_year+1900 <<"/"<<
-        pool[t].opTime.tm_mon + 1<<"/"<<
-          pool[t].opTime.tm_mday<<" - "<<
-            pool[t].opTime.tm_hour<<":"<<pool[t].opTime.tm_min<<"\t\n";
+    for (int t = 0; t < j; t++) {
+      std::cout << std::setw(25) << pool[t].userId << std::setw(20) << pool[t].op;
+      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/" <<
+          pool[t].opTime.tm_mon + 1 << "/" <<
+          pool[t].opTime.tm_mday << " - " <<
+          pool[t].opTime.tm_hour << ":" << pool[t].opTime.tm_min << "\t\n";
     }
   }
-  if( i * j != k) {
-    int f = k - ( i - 1) * j;
-    logSystem.read_block(pool,f,count - ( i - 1) * j);
-    for(int t = 0 ;t < f;t++){
-      std::cout<<"\t"<<pool[t].userId<<"\t"<<
-         pool[t].op;
-      std::cout<<"\t\t"<<pool[t].opTime.tm_year+1900 <<"/"<<
-        pool[t].opTime.tm_mon + 1<<"/"<<
-          pool[t].opTime.tm_mday<<" - "<<
-            pool[t].opTime.tm_hour<<":"<<pool[t].opTime.tm_min<<"\t\n";
+  if (i * j != k) {
+    int f = k - (i - 1) * j;
+    logSystem.read_block(pool, f, count - (i - 1) * j);
+    for (int t = 0; t < f; t++) {
+      std::cout << std::setw(25) << pool[t].userId << std::setw(20) << pool[t].op;
+      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/" <<
+          pool[t].opTime.tm_mon + 1 << "/" <<
+          pool[t].opTime.tm_mday << " - " <<
+          pool[t].opTime.tm_hour << ":" << pool[t].opTime.tm_min << "\t\n";
     }
   }
 }
+
 //写入系统日志 op代表操作 0 - 13
-void SystemLog::save(const char * userId_,int pri,int op) {
-  SysLog sys(userId_,pri,op);
+void SystemLog::save(const char *userId_, int pri, int op) {
+  SysLog sys(userId_, pri, op);
   logSystem.write(sys);
   count++;
 }

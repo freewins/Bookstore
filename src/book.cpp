@@ -151,10 +151,9 @@ bool book::modify(Book &tmp, const char *ISBN, const char *new_data, int &pos, i
       break;
     }
     case 4: {
-      if(tmp.insertKey(new_data)) {
-        bookIndex.updateData(tmp,pos);
-      }
-      else return false;
+      if (tmp.insertKey(new_data)) {
+        bookIndex.updateData(tmp, pos);
+      } else return false;
       break;
     }
   }
