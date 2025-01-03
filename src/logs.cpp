@@ -182,10 +182,16 @@ void Operator::read(int k) {
           break;
         }
       }
-      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/" <<
-          pool[t].opTime.tm_mon + 1 << "/" <<
-          pool[t].opTime.tm_mday << " - " <<
-          pool[t].opTime.tm_hour << ":" << pool[t].opTime.tm_min << "\t\n";
+      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/";
+      if (pool[t].opTime.tm_mon <= 8)std::cout << "0";
+      std::cout << pool[t].opTime.tm_mon + 1 << "/";
+      if (pool[t].opTime.tm_mday < 10)std::cout << "0";
+      std::cout << pool[t].opTime.tm_mday << " - ";
+      if (pool[t].opTime.tm_hour < 10)
+        std::cout << "0";
+      std::cout << pool[t].opTime.tm_hour << ":";
+      if (pool[t].opTime.tm_min < 10)std::cout << "0";
+      std::cout << pool[t].opTime.tm_min << "\n";
     }
   }
   if (i * j != k) {
@@ -219,10 +225,16 @@ void Operator::read(int k) {
           break;
         }
       }
-      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/" <<
-          pool[t].opTime.tm_mon + 1 << "/" <<
-          pool[t].opTime.tm_mday << " - " <<
-          pool[t].opTime.tm_hour << ":" << pool[t].opTime.tm_min << "\t\n";
+      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/";
+      if (pool[t].opTime.tm_mon <= 8)std::cout << "0";
+      std::cout << pool[t].opTime.tm_mon + 1 << "/";
+      if (pool[t].opTime.tm_mday < 10)std::cout << "0";
+      std::cout << pool[t].opTime.tm_mday << " - ";
+      if (pool[t].opTime.tm_hour < 10)
+        std::cout << "0";
+      std::cout << pool[t].opTime.tm_hour << ":";
+      if (pool[t].opTime.tm_min < 10)std::cout << "0";
+      std::cout << pool[t].opTime.tm_min << "\n";
     }
   }
 }
@@ -262,10 +274,16 @@ void SystemLog::read(int k) {
     }
     for (int t = 0; t < j; t++) {
       std::cout << std::setw(25) << pool[t].userId << std::setw(20) << pool[t].op;
-      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/" <<
-          pool[t].opTime.tm_mon + 1 << "/" <<
-          pool[t].opTime.tm_mday << " - " <<
-          pool[t].opTime.tm_hour << ":" << pool[t].opTime.tm_min << "\t\n";
+      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/";
+      if (pool[t].opTime.tm_mon <= 8)std::cout << "0";
+      std::cout << pool[t].opTime.tm_mon + 1 << "/";
+      if (pool[t].opTime.tm_mday < 10)std::cout << "0";
+      std::cout << pool[t].opTime.tm_mday << " - ";
+      if (pool[t].opTime.tm_hour < 10)
+        std::cout << "0";
+      std::cout << pool[t].opTime.tm_hour << ":";
+      if (pool[t].opTime.tm_min < 10)std::cout << "0";
+      std::cout << pool[t].opTime.tm_min << "\n";
     }
   }
   if (i * j != k) {
@@ -273,10 +291,16 @@ void SystemLog::read(int k) {
     logSystem.read_block(pool, f, count - (i - 1) * j);
     for (int t = 0; t < f; t++) {
       std::cout << std::setw(25) << pool[t].userId << std::setw(20) << pool[t].op;
-      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/" <<
-          pool[t].opTime.tm_mon + 1 << "/" <<
-          pool[t].opTime.tm_mday << " - " <<
-          pool[t].opTime.tm_hour << ":" << pool[t].opTime.tm_min << "\t\n";
+      std::cout << "\t" << pool[t].opTime.tm_year + 1900 << "/";
+      if (pool[t].opTime.tm_mon <= 8)std::cout << "0";
+      std::cout << pool[t].opTime.tm_mon + 1 << "/";
+      if (pool[t].opTime.tm_mday < 10)std::cout << "0";
+      std::cout << pool[t].opTime.tm_mday << " - ";
+      if (pool[t].opTime.tm_hour < 10)
+        std::cout << "0";
+      std::cout << pool[t].opTime.tm_hour << ":";
+      if (pool[t].opTime.tm_min < 10)std::cout << "0";
+      std::cout << pool[t].opTime.tm_min << "\n";
     }
   }
 }
